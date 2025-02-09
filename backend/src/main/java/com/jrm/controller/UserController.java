@@ -1,11 +1,12 @@
 package com.jrm.controller;
 
-import java.util.List;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.catalina.connector.Response;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.jrm.dto.UserDTO;
+
 import com.jrm.dto.converter.UserConverterDTO;
+import com.jrm.dto.user.UserCreateDTO;
+
 import com.jrm.model.User;
 import com.jrm.service.UserService;
 
@@ -73,14 +76,16 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO user) {
         
-        return userService.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
+   	
 
     @PutMapping("/user/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.update(id, user);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
+        
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(id, user));
     }
 
     @DeleteMapping("/user/{id}")
@@ -96,7 +101,7 @@ public class UserController {
             
             return ResponseEntity.notFound().build();  // 404 Not Found si no existe el usuario
         }
-        
+
     }
     
 

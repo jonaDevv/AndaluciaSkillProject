@@ -1,4 +1,4 @@
-package com.jrm.dto;
+package com.jrm.dto.user;
 
 import lombok.Data;
 
