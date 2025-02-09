@@ -3,10 +3,12 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -30,11 +32,12 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
 
 
-    
+    @ApiModelProperty(value = "Identificador único del usuario", example = "1", position = 1)
     @Id
 	@GeneratedValue
     private Long id;
 
+	@ApiModelProperty(value = "DNI del usuario", example = "12345678Z", position = 2)
     @Column(unique = true)
     private String dni;
 
