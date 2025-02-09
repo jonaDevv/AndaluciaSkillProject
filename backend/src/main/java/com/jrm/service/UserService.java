@@ -5,14 +5,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.jrm.dto.user.UserCreateDTO;
-import com.jrm.dto.user.UserEditDTO;
+
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.model.User;
 import com.jrm.repository.UserRepository;
 import com.jrm.service.base.BaseService;
 
 
-import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
