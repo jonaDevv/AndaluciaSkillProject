@@ -1,0 +1,14 @@
+/* Efecto hover sobre los enlaces */
+.navbar-nav .nav-link:hover {
+    color: #ffdb58; /* Color dorado */
+    text-decoration: underline; /* Subrayado al hacer hover */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Efecto hover sobre los botones */
+.btn-outline-light:hover {
+    color: #fff; /* Texto blanco */
+    background-color: #ffdb58; /* Fondo dorado */
+    border-color: #ffdb58; /* Borde dorado */
+    transition: all 0.3s ease; /* Transición suave */
+}
