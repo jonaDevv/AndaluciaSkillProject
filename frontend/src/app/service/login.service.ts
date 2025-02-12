@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -59,23 +59,36 @@ export class LoginService {
     }
   }
 
-  login(user:string, pass:string){
+  login(user:string, pass:string):Observable<any>{
 
     let objeto:any;
     objeto = this;
 
-    this.http.post("http://localhost/js/Angular/Servidor/login.php", {
+    return this.http.post("http://localhost/js/Angular/Servidor/login.php", {
       user: user,
       pass: pass
-    }).subscribe(function(data:any){
-
-      objeto.usuario={"nombre":data.user}
-      objeto.perfil = data.perfil;
-      objeto.logeado = true;
-      objeto.token = data.token;
-      objeto.almacenar();
-      
     })
+    .pipe(map((data:any)=>{
+      //Analizar respuesta
+      let respuesta:boolean=false;
+      if(data.status == 200){
+
+
+        objeto.usuario={"nombre":data.user}
+        objeto.perfil = data.perfil;
+        objeto.logeado = true;
+        objeto.token = data.token;
+        objeto.almacenar();
+
+        respuesta=true;
+
+      }else{
+        respuesta=false;
+      }
+
+      return respuesta;
+      
+    }))
 
 
 

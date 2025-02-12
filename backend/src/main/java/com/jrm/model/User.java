@@ -3,12 +3,13 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.units.qual.A;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 
-import io.swagger.annotations.ApiModelProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -16,9 +17,12 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,27 +32,34 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data  @AllArgsConstructor
 @NoArgsConstructor
+@Validated
 @Entity
 public class User implements UserDetails {
 
 
-    @ApiModelProperty(value = "Identificador único del usuario", example = "1", position = 1)
+   
     @Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-	@ApiModelProperty(value = "DNI del usuario", example = "12345678Z", position = 2)
+	
+	@NotNull(message = "El Dnino puede ser nulo")
+	@Pattern(regexp = "^[0-9]{8}[A-Za-z]$", message = "El DNI debe tener 8 dígitos seguidos de una letra")
     @Column(unique = true)
     private String dni;
 
+	@NotNull(message = "El nombre no puede ser nulo")
     private String nombre;
 
+	@NotNull(message = "El username no puede ser nulo")
+	@Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "El username debe ser un correo electronico")
     @Column(unique = true)
     private String username;
 
+	@NotNull(message = "La password no puede ser nulo")
     private String password;
 
-   @ManyToOne
+   	@ManyToOne
     @JoinColumn(name = "specialty_id") 
     private Specialty specialty;
 

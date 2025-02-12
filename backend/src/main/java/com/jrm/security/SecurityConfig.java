@@ -9,15 +9,23 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.jrm.security.jwt.JwtAuthorizationFilter;
+
+import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
@@ -25,55 +33,67 @@ public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
     private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(UserDetailsService userDetailsService, 
-                          AuthenticationEntryPoint jwtAuthenticationEntryPoint, 
-                          JwtAuthorizationFilter jwtAuthorizationFilter, 
-                          PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAuthorizationFilter = jwtAuthorizationFilter;
-        this.passwordEncoder = passwordEncoder;
-    }
+    
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-        return authenticationManagerBuilder.build();
+        AuthenticationManagerBuilder authManagerBuilder = 
+        http.getSharedObject(AuthenticationManagerBuilder.class);
+        
+        authManagerBuilder
+        .userDetailsService(userDetailsService)
+        .passwordEncoder(passwordEncoder);
+
+        return authManagerBuilder.build();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Configuración de seguridad en HttpSecurity
         http
-            // Desactivamos la protección CSRF, generalmente no es necesario en aplicaciones con JWT
             .csrf(csrf -> csrf.disable())
-            
-            // Manejo de excepciones, autenticación y entry point
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .exceptionHandling(exception -> 
                 exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
-            
-            // Gestión de sesiones sin estado (para usar JWT en lugar de sesiones)
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            
-            // Cambiado de authorizeRequests() a authorizeHttpRequests() debido a la deprecación
-            .authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/producto/**", "/lote/**").hasRole("USER")
-                    .requestMatchers(HttpMethod.POST, "/producto/**", "/lote/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/producto/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/producto/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST, "/pedido/**").hasAnyRole("USER", "ADMIN")
-                    .anyRequest().authenticated()
-            );
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/login","/auth/register" ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/users", "/specialty").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/**","/auth/**","/users","/specialty").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/users","/users/**","/specialty/**").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/users","/specialty/**").permitAll()
 
-        // Añadimos el filtro JWT antes de la autenticación básica
-        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
+                // .requestMatchers(HttpMethod.GET, "/users/**", "/lote/**").hasAuthority("EXPERT")
+                // .requestMatchers(HttpMethod.POST, "/lote/**").hasAuthority("ADMIN")
+                // .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ADMIN")
+                // .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ADMIN")
+                // .requestMatchers(HttpMethod.POST, "/users/**").hasAnyAuthority("EXPERT", "ADMIN")
+                // .anyMatch(true).authenticated()
+                // .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+     
+    
+   
 }

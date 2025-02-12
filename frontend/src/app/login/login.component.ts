@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../service/login.service';
-import { RedirectCommand } from '@angular/router';
+import { RedirectCommand, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,7 @@ export class LoginComponent {
   usuario : string;
   clave : string;
 
-  constructor(private login: LoginService) {
+  constructor(private login: LoginService, private route: Router) {
     this.usuario = "";
     this.clave = "";
 
@@ -23,7 +23,12 @@ export class LoginComponent {
 
   logear():void{
     
-    this.login.login(this.usuario, this.clave);
+    this.login.login(this.usuario, this.clave).subscribe(()=>{  
+      
+      this.route.navigate(["/"]); 
+
+      
+    });
 
     
   }

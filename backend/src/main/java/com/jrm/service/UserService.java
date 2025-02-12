@@ -7,12 +7,14 @@ import java.util.stream.Stream;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.jrm.dto.user.UserCreateDTO;
 
 import com.jrm.error.user.UserNotFoundException;
+import com.jrm.model.Specialty;
 import com.jrm.model.User;
 import com.jrm.model.UserRole;
 import com.jrm.repository.UserRepository;
@@ -26,8 +28,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService implements BaseService<User, Long> {
 
-    private UserRepository userRepository;
-    private SpecialtyService specialtyService;
+    private final UserRepository userRepository;
+    private final SpecialtyService specialtyService;
+    private final PasswordEncoder  passwordEncoder;
 
 
     @Override
@@ -52,19 +55,66 @@ public class UserService implements BaseService<User, Long> {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    @Override
-    public User save(UserCreateDTO user) {
-        
-        User nuevoUsuario = User.builder()
-                .dni(user.getDni())
-                .nombre(user.getNombre())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .specialty(specialtyService.findById(user.getSpecialtyId()).orElse(null))
-                .build();
-        
-        return userRepository.save(nuevoUsuario);
+    public Optional<User> findByIdd(Long id) {
+        return userRepository.findById(id);
     }
+
+    // @Override
+    // public User save(User user) {
+        
+    //     User nuevoUsuario = User.builder()
+    //             .dni(user.getDni())
+    //             .nombre(user.getNombre())
+    //             .username(user.getUsername())
+    //             .password(user.getPassword())
+    //             .specialty(specialtyService.findById(user.getSpecialty().getId()))
+    //             // .orElse(null))
+    //             .build();
+        
+    //     return userRepository.save(nuevoUsuario);
+    // }
+    @Override
+    public User save(User user) {
+        try {
+            
+            User nuevoUsuario = User.builder()
+                    .dni(user.getDni())
+                    .nombre(user.getNombre())
+                    .username(user.getUsername())
+                    .password(passwordEncoder.encode(user.getPassword()))
+                    .specialty(specialtyService.findById(user.getSpecialty().getId()))
+                    .roles(user.getRoles())
+                    .build();
+
+            return userRepository.save(nuevoUsuario);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya existe");
+        }
+    }
+
+    // public User createUser(UserCreateDTO userDTO) {
+    
+    //      // 1. Validar specialtyId
+    //         if (userDTO.getSpecialtyId() == null) {
+    //             throw new IllegalArgumentException("El ID de especialidad es requerido");
+    //         }
+
+    //         // 2. Buscar la specialty
+    //         Specialty specialty = specialtyService.findById(userDTO.getSpecialtyId());
+
+    //         // 3. Construir el usuario
+    //         User user = User.builder()
+    //             .dni(userDTO.getDni())
+    //             .nombre(userDTO.getNombre())
+    //             .username(userDTO.getUsername())
+    //             .password(passwordEncoder.encode(userDTO.getPassword()))
+    //             .specialty(specialty)
+    //             .build();
+
+    //         // 4. Guardar y retornar
+    //         return userRepository.save(user);
+    // }
 
     // public User nuevoUsuario(UserCreateDTO newUser) {
 
@@ -90,17 +140,16 @@ public class UserService implements BaseService<User, Long> {
 
     @Override
     public User update(Long id, User userEdit) {
-        
-        return userRepository.findById(id).map(u -> {
-
-            u.setDni(userEdit.getDni());
-            u.setNombre(userEdit.getNombre());
-            u.setUsername(userEdit.getUsername());
-            u.setPassword(userEdit.getPassword());
-            u.setSpecialty(specialtyService.findById(userEdit.getSpecialty().getId()).orElse(null));
-            
-            return userRepository.save(u);
-        }).orElseThrow();
+        return userRepository.findById(id)
+                             .map(u -> {
+                                 u.setDni(userEdit.getDni());
+                                 u.setNombre(userEdit.getNombre());
+                                 u.setUsername(userEdit.getUsername());
+                                 u.setPassword(userEdit.getPassword());
+                                 u.setSpecialty(specialtyService.findById(userEdit.getSpecialty().getId()));
+                                 return userRepository.save(u);
+                             })
+                             .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     

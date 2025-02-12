@@ -10,7 +10,7 @@ public interface BaseService<T, N> {
 
      List<T> findAll();
      T findById(N id);
-     T save(UserCreateDTO user);
+     T save(T user);
      T update(N id, T t);
      void delete(N id);
 
