@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.error.user.UserNotFoundException;
+import com.jrm.error.user.UsernameExistsException;
 
 
 @RestControllerAdvice
@@ -20,18 +22,25 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 	
 	
 	
-	@ExceptionHandler(UserNotFoundException.class)
+	@ExceptionHandler({UserNotFoundException.class, UsernameExistsException.class})
 	public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException ex) {
-		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
+		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, null, ex.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
 	}
+
+	@ExceptionHandler(SpecialtyNotFoundException.class)
+    public ResponseEntity<ApiError> handleSpecialtyNotFound(SpecialtyNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, null, ex.getMessage());
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
 	
 	
 	
 
 	@Override
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,HttpStatusCode status, WebRequest request) {
-		ApiError  apiError = new ApiError(status, ex.getMessage());
+		ApiError  apiError = new ApiError(status, null, ex.getMessage());
 		return ResponseEntity.status(status).headers(headers).body(apiError);
 	}
 

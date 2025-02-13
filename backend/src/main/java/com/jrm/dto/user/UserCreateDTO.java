@@ -2,6 +2,7 @@ package com.jrm.dto.user;
 
 import java.util.Set;
 
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.validation.annotation.Validated;
 
 import com.jrm.model.UserRole;

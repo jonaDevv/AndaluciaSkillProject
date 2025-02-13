@@ -19,7 +19,7 @@ public class UserUpdateDTO {
     @Pattern(regexp = "^[0-9]{8}[A-Za-z]$")
     private String dni;
     
-   
+    
     private String nombre;
     
     

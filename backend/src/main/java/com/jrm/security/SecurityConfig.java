@@ -103,7 +103,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/specialty").hasAnyAuthority("ROLE_ADMIN", "ROLE_EXPERT")
                 
                 // Operaciones de escritura (solo ADMIN)
-                .requestMatchers(HttpMethod.POST, "/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.POST, "/participant","/users", "/specialty").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/participant/","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/participant/","/users", "/specialty/**").hasAuthority("ROLE_ADMIN")
                 

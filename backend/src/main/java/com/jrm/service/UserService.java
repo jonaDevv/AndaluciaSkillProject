@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.jrm.dto.user.UserCreateDTO;
-
+import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.model.Specialty;
 import com.jrm.model.User;
@@ -20,8 +20,7 @@ import com.jrm.model.UserRole;
 import com.jrm.repository.UserRepository;
 import com.jrm.service.base.BaseService;
 
-
-
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -48,6 +47,10 @@ public class UserService implements BaseService<User, Long> {
 	public Optional<User> findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
+
+    public Optional<User> findByDni(String dni) {
+        return userRepository.findByDni(dni);
+    }
     
 
     @Override
@@ -61,7 +64,7 @@ public class UserService implements BaseService<User, Long> {
 
    
     @Override
-    public User save(User user) {
+    public User save(@Valid User user) {
         try {
             
             User nuevoUsuario = User.builder()
@@ -69,7 +72,8 @@ public class UserService implements BaseService<User, Long> {
                     .nombre(user.getNombre())
                     .username(user.getUsername())
                     .password(passwordEncoder.encode(user.getPassword()))
-                    .specialty(specialtyService.findById(user.getSpecialty().getId()).orElse(null))
+                    .specialty(specialtyService.findById(user.getSpecialty().getId())
+                    .orElseThrow(()-> new SpecialtyNotFoundException(user.getSpecialty().getId())))
                     .roles(user.getRoles())
                     .build();
 

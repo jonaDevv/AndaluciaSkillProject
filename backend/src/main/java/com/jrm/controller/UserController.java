@@ -9,9 +9,12 @@ import com.jrm.dto.user.UserCreateDTO;
 import com.jrm.dto.user.UserDTO;
 import com.jrm.dto.user.UserResponseDTO;
 import com.jrm.dto.user.UserUpdateDTO;
+import com.jrm.error.ApiError;
 import com.jrm.error.participant.ParticipantNotFoundException;
+import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.model.Specialty;
 import com.jrm.model.User;
+import com.jrm.service.ApiErrorService;
 import com.jrm.service.SpecialtyService;
 import com.jrm.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +32,7 @@ public class UserController {
     private final SpecialtyService specialtyService;
     private final UserConverterDTO userConverterDTO;
     private final ConverterDto genericDto;
+    private final ApiErrorService apiErrorService;
 
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
@@ -52,13 +56,27 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
+        
         if (userDto == null) {
             return ResponseEntity.badRequest().body("El cuerpo de la solicitud no puede ser nulo");
+        }
+
+        if (userService.findByDni(userDto.getDni()).isPresent()) {
+            ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+
+    
+        if (userService.findByUsername(userDto.getUsername()).isPresent()) {
+            ApiError apiError = apiErrorService.getErrorMessage("El usuario " + userDto.getUsername() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
         }
         
         User user = genericDto.genericConvert(userDto, User.class);
 
-        user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId()).orElse(null));
+        user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId())
+                        .orElseThrow(() -> new SpecialtyNotFoundException(userDto.getSpecialtyId())));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
 
