@@ -14,17 +14,20 @@ import lombok.NoArgsConstructor;
 @Validated
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserUpdateDTO {
-    @NotBlank
+
+
     @Pattern(regexp = "^[0-9]{8}[A-Za-z]$")
     private String dni;
     
-    @NotBlank
+   
     private String nombre;
     
- 
-    @NotBlank
-    private String username;
     
-    @NotNull
+    private String username;
+
+    private String password;
+    
     private Long specialtyId;
+
+    
 }

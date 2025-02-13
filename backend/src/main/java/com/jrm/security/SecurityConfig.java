@@ -47,6 +47,38 @@ public class SecurityConfig {
         return authManagerBuilder.build();
     }
 
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //         .csrf(csrf -> csrf.disable())
+    //         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    //         .exceptionHandling(exception -> 
+    //             exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+    //         )
+    //         .sessionManagement(session -> 
+    //             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    //         )
+    //         .authorizeHttpRequests(auth -> auth
+    //             .requestMatchers("/auth/login","/auth/register" ).permitAll()
+    //             .requestMatchers(HttpMethod.GET, "/users", "/specialty").permitAll()
+    //             .requestMatchers(HttpMethod.POST, "/auth/**","/auth/**","/users","/specialty").permitAll()
+    //             .requestMatchers(HttpMethod.PUT, "/users","/users/**","/specialty/**").permitAll()
+    //             .requestMatchers(HttpMethod.DELETE, "/users","/specialty/**").permitAll()
+
+
+    //             // .requestMatchers(HttpMethod.GET, "/users/**", "/lote/**").hasAuthority("EXPERT")
+    //             // .requestMatchers(HttpMethod.POST, "/lote/**").hasAuthority("ADMIN")
+    //             // .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ADMIN")
+    //             // .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ADMIN")
+    //             // .requestMatchers(HttpMethod.POST, "/users/**").hasAnyAuthority("EXPERT", "ADMIN")
+    //             // .anyMatch(true).authenticated()
+    //             // .anyRequest().authenticated()
+    //         )
+    //         .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
+    //     return http.build();
+    // }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -59,20 +91,24 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login","/auth/register" ).permitAll()
-                .requestMatchers(HttpMethod.GET, "/users", "/specialty").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/**","/auth/**","/users","/specialty").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/users","/users/**","/specialty/**").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/users","/specialty/**").permitAll()
-
-
-                // .requestMatchers(HttpMethod.GET, "/users/**", "/lote/**").hasAuthority("EXPERT")
-                // .requestMatchers(HttpMethod.POST, "/lote/**").hasAuthority("ADMIN")
-                // .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ADMIN")
-                // .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ADMIN")
-                // .requestMatchers(HttpMethod.POST, "/users/**").hasAnyAuthority("EXPERT", "ADMIN")
-                // .anyMatch(true).authenticated()
-                // .anyRequest().authenticated()
+                // Endpoints públicos
+                .requestMatchers(HttpMethod.POST,"/auth/login", "/auth/register").permitAll()
+                
+                // Solo ADMIN puede ver lista de Users
+                .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ROLE_ADMIN")
+                
+                // ADMIN y EXPERT pueden ver lista de Specialty
+                .requestMatchers(HttpMethod.GET, "/specialty").hasAnyAuthority("ROLE_ADMIN", "ROLE_EXPERT")
+                
+                // Operaciones de escritura (solo ADMIN)
+                .requestMatchers(HttpMethod.POST, "/users", "/specialty").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/users", "/specialty/**").hasAuthority("ROLE_ADMIN")
+                
+                // Cualquier otra solicitud requiere autenticación
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 

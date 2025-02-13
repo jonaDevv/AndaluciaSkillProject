@@ -59,39 +59,32 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginDto login(@RequestBody LoginRequest loginRequest) {
-        // Log de la entrada
         System.out.println("Recibiendo solicitud de login:");
         System.out.println("Usuario: " + loginRequest.username());
-        System.out.println("Contraseña: " + loginRequest.password());  // ¡Evita esto en producción!
-    
+        System.out.println("Contraseña: " + loginRequest.password());
+
         try {
-            // Realizar la autenticación
-            Authentication authDTO = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.username(),
-                            loginRequest.password()
-                    )
+            // Autenticar una sola vez
+            Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.username(),
+                    loginRequest.password()
+                )
             );
-    
-            // Log después de la autenticación
+
             System.out.println("Autenticación exitosa para el usuario: " + loginRequest.username());
-    
-            Authentication authentication = this.authManager.authenticate(authDTO);
-            User user = (User) authentication.getPrincipal();
-    
-            // Generar el token
+
+            User user = (User) authentication.getPrincipal(); // Usar el objeto autenticado directamente
             String token = jwtUtils.generateToken(user);
+
             System.out.println("Token generado: " + token);
-    
-            // Retornar DTO con token
-            return new LoginDto(user.getUsername(),user.getRoles(), token);
-    
+            return new LoginDto(user.getUsername(), user.getRoles(),user.getSpecialty().getName(), token);
+
         } catch (Exception e) {
             System.out.println("Error durante la autenticación: " + e.getMessage());
-            throw e;  // Lanza el error para que el controlador lo maneje
+            throw e;
         }
     }
-    
    
     // public record JwtResponse(String token) {}
 }

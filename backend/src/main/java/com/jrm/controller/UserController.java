@@ -7,6 +7,9 @@ import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.converter.UserConverterDTO;
 import com.jrm.dto.user.UserCreateDTO;
 import com.jrm.dto.user.UserDTO;
+import com.jrm.dto.user.UserResponseDTO;
+import com.jrm.dto.user.UserUpdateDTO;
+import com.jrm.model.Specialty;
 import com.jrm.model.User;
 import com.jrm.service.SpecialtyService;
 import com.jrm.service.UserService;
@@ -31,8 +34,8 @@ public class UserController {
         if (users.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        List<UserDTO> userDTOs = users.stream()
-                                      .map(userConverterDTO::convert)
+        List<UserResponseDTO> userDTOs = users.stream()
+                                      .map(u-> genericDto.genericConvert(u, UserResponseDTO.class))
                                       .toList();
         return ResponseEntity.ok(userDTOs);
     }
@@ -56,8 +59,21 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@Valid @PathVariable Long id, @Valid @RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(id, user));
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
+        User user = userService.findById(id);
+        
+        user.setDni(userDTO.getDni());
+        user.setNombre(userDTO.getNombre());
+        user.setUsername(userDTO.getUsername());
+
+        // Mapear specialtyId a un objeto Specialty
+        if (userDTO.getSpecialtyId() != null) {
+            Specialty specialty = new Specialty();
+            specialty.setId(userDTO.getSpecialtyId());
+            user.setSpecialty(specialty);
+        }
+        
+        return ResponseEntity.ok(userService.update(id, user));
     }
 
     @DeleteMapping("/{id}")

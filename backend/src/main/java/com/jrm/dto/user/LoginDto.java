@@ -16,6 +16,7 @@ public class LoginDto {
 
     private String username; 
     private Set<UserRole> roles;
+    private String specialtyName;
     private String token;
     
     

@@ -138,18 +138,26 @@ public class UserService implements BaseService<User, Long> {
 
     
 
+    // @Override
+    // public User update(Long id, User userEdit) {
+    //     return userRepository.findById(id)
+    //                          .map(u -> {
+    //                              u.setDni(userEdit.getDni());
+    //                              u.setNombre(userEdit.getNombre());
+    //                              u.setUsername(userEdit.getUsername());
+    //                              u.setPassword(userEdit.getPassword());
+    //                              u.setSpecialty(specialtyService.findById(userEdit.getSpecialty().getId()));
+    //                              return userRepository.save(u);
+    //                          })
+    //                          .orElseThrow(() -> new UserNotFoundException(id));
+    // }
+
     @Override
     public User update(Long id, User userEdit) {
-        return userRepository.findById(id)
-                             .map(u -> {
-                                 u.setDni(userEdit.getDni());
-                                 u.setNombre(userEdit.getNombre());
-                                 u.setUsername(userEdit.getUsername());
-                                 u.setPassword(userEdit.getPassword());
-                                 u.setSpecialty(specialtyService.findById(userEdit.getSpecialty().getId()));
-                                 return userRepository.save(u);
-                             })
-                             .orElseThrow(() -> new UserNotFoundException(id));
+        
+                    
+            return userRepository.save(userEdit);
+            
     }
 
     

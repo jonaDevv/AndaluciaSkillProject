@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Validated
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserDTO {
-
+    
    @NotBlank(message = "El DNI no puede ser nulo")
     @Pattern(regexp = "^[0-9]{8}[A-Za-z]$", message = "El DNI debe tener 8 dígitos seguidos de una letra")
     private String dni;

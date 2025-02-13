@@ -8,13 +8,23 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+// @Component
+// public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    
+//     @Override
+//     public void commence(HttpServletRequest request,
+//                          HttpServletResponse response,
+//                          AuthenticationException authException) throws IOException {
+//         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+//     }
+// }
+
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    
     @Override
-    public void commence(HttpServletRequest request,
+    public void commence(HttpServletRequest request, 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Acceso no autorizado: " + authException.getMessage());
     }
 }

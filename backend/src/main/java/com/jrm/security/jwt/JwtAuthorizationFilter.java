@@ -35,23 +35,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
         
-        String token = header.substring(7);//Se puede hacer en un metodo
+        String token = header.substring(7);
         
-        if (jwtUtils.validateToken(token)) {
-            String username = jwtUtils.getUsernameFromToken(token);
-            // UserDetails userDetails = userDetailsService.loadUserByUsername(username);//o user service
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);//o user service
-
-            
-            UsernamePasswordAuthenticationToken authentication =//Usar authentication
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,//userDetails.getUsername
-                            null,//userDetails.getPassword
-                            userDetails.getAuthorities());
-
-            
-            
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            if (jwtUtils.validateToken(token)) {
+                String username = jwtUtils.getUsernameFromToken(token);
+                
+                // Cargar usuario desde la BD (si no existe, lanza excepción)
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                
+                // Crear autenticación
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
+                
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            // Manejar errores (ej. usuario no encontrado, token inválido)
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o usuario no existe");
+            return;
         }
         
         filterChain.doFilter(request, response);

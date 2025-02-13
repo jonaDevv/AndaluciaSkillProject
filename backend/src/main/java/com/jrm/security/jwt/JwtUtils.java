@@ -45,14 +45,14 @@ public class JwtUtils {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .subject(Long.toString(user.getId()))
+                .subject(user.getUsername())
                 // .headerParam("typ", "JWT")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                 .signWith(getSigningKey())
                 .claim("roles", user.getRoles().stream()
-                                        .map(role -> role.name())
-                                        .collect(Collectors.toList()))
+                    .map(role -> "ROLE_" + role.name()) // Agregar prefijo
+                    .collect(Collectors.toList()))
                 .compact();
     }
 
