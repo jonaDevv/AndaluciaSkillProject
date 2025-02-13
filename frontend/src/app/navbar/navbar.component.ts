@@ -22,6 +22,13 @@ export class NavbarComponent {
 
   }
 
+  ngOnInit(){
+   
+    this.nombre = this.getNombre();
+    this.perfil = this.getPerfil();
+
+  }
+
   login(){
     
     this.router.navigate(['/login']);
@@ -43,6 +50,11 @@ export class NavbarComponent {
   getNombre():string{
     
     return this.service.getNombre();
+  }
+
+  getPerfil():string{
+    
+    return this.service.getPerfil();
   }
 
 }

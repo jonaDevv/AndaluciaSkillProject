@@ -64,9 +64,9 @@ export class LoginService {
     let objeto:any;
     objeto = this;
 
-    return this.http.post("http://localhost/js/Angular/Servidor/login.php", {
-      user: user,
-      pass: pass
+    return this.http.post("http://localhost:8080/auth/login", {
+      username: user,
+      password: pass
     })
     .pipe(map((data:any)=>{
       //Analizar respuesta
@@ -74,19 +74,20 @@ export class LoginService {
       if(data!=null && data.token!=""){
 
 
-        objeto.usuario={"nombre":data.user}
-        objeto.perfil = data.rol;
+        objeto.usuario={"nombre":data.username}
+        objeto.perfil = data.roles[0];
         objeto.token = data.token;
         objeto.logeado = true;
         objeto.almacenar();
 
-        respuesta= {"funciona":true, "perfil":data.rol};
+        respuesta= {"funciona":true, "perfil":data.roles};
 
       }else{
         
         respuesta= {"funciona":false};
       }
 
+      
       return respuesta;
       
     }))
@@ -133,6 +134,19 @@ export class LoginService {
     if(contenido)
     {
       respuesta= JSON.parse(contenido||"").usuario.nombre;
+    }
+    return respuesta;
+  }
+
+
+  getPerfil():string{
+    let respuesta:string="";
+    let contenido:string|null = sessionStorage.getItem("LOGIN");  
+    
+    if(contenido)
+    {
+      console.log(JSON.parse(contenido||"").usuario.perfil)
+      respuesta= JSON.parse(contenido||"").perfil;
     }
     return respuesta;
   }
