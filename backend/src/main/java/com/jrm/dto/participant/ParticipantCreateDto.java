@@ -1,12 +1,9 @@
-package com.jrm.model;
+package com.jrm.dto.participant;
 
-import org.springframework.boot.autoconfigure.rsocket.RSocketProperties.Server.Spec;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.jrm.model.Specialty;
+
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,20 +13,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
-@Builder
-@AllArgsConstructor
 @Validated
-@NoArgsConstructor
-public class Participant {
+@NoArgsConstructor @AllArgsConstructor @Builder
+public class ParticipantCreateDto {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull(message = "El nombre del participante no puede ser nulo")
+     @NotNull(message = "El nombre del participante no puede ser nulo")
     
     private String name;
 
@@ -40,9 +29,8 @@ public class Participant {
     private float maximumScore;
 
 
-    @ManyToOne
-    @JoinColumn(name = "specialty_id") 
-    private Specialty specialty;
+    private Long specialtyId;
+
 
 
 

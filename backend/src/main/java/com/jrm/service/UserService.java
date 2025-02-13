@@ -59,20 +59,7 @@ public class UserService implements BaseService<User, Long> {
         return userRepository.findById(id);
     }
 
-    // @Override
-    // public User save(User user) {
-        
-    //     User nuevoUsuario = User.builder()
-    //             .dni(user.getDni())
-    //             .nombre(user.getNombre())
-    //             .username(user.getUsername())
-    //             .password(user.getPassword())
-    //             .specialty(specialtyService.findById(user.getSpecialty().getId()))
-    //             // .orElse(null))
-    //             .build();
-        
-    //     return userRepository.save(nuevoUsuario);
-    // }
+   
     @Override
     public User save(User user) {
         try {
@@ -89,68 +76,11 @@ public class UserService implements BaseService<User, Long> {
             return userRepository.save(nuevoUsuario);
 
         } catch (DataIntegrityViolationException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya existe");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al crear el usuario");
         }
     }
 
-    // public User createUser(UserCreateDTO userDTO) {
-    
-    //      // 1. Validar specialtyId
-    //         if (userDTO.getSpecialtyId() == null) {
-    //             throw new IllegalArgumentException("El ID de especialidad es requerido");
-    //         }
-
-    //         // 2. Buscar la specialty
-    //         Specialty specialty = specialtyService.findById(userDTO.getSpecialtyId());
-
-    //         // 3. Construir el usuario
-    //         User user = User.builder()
-    //             .dni(userDTO.getDni())
-    //             .nombre(userDTO.getNombre())
-    //             .username(userDTO.getUsername())
-    //             .password(passwordEncoder.encode(userDTO.getPassword()))
-    //             .specialty(specialty)
-    //             .build();
-
-    //         // 4. Guardar y retornar
-    //         return userRepository.save(user);
-    // }
-
-    // public User nuevoUsuario(UserCreateDTO newUser) {
-
-	// 	if (newUser.getPassword().contentEquals(newUser.getPassword2())) {
-	// 		User userEntity = User.builder().username(newUser.getUsername())
-	// 				.password(passwordEncoder.encode(newUser.getPassword())).avatar(newUser.getAvatar())
-	// 				.fullName(newUser.getFullname()).email(newUser.getEmail())
-	// 				.roles(Stream.of(UserRole.USER).collect(Collectors.toSet())).build();
-	// 		try {
-	// 			return save(userEntity);
-	// 		} catch (DataIntegrityViolationException ex) {
-	// 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya existe");
-	// 		}
-	// 	} else {
-	// 		throw new NewUserWithDifferentPasswordsException();
-	// 	}
-
-	// }
-
-    
-
-    
-
-    // @Override
-    // public User update(Long id, User userEdit) {
-    //     return userRepository.findById(id)
-    //                          .map(u -> {
-    //                              u.setDni(userEdit.getDni());
-    //                              u.setNombre(userEdit.getNombre());
-    //                              u.setUsername(userEdit.getUsername());
-    //                              u.setPassword(userEdit.getPassword());
-    //                              u.setSpecialty(specialtyService.findById(userEdit.getSpecialty().getId()));
-    //                              return userRepository.save(u);
-    //                          })
-    //                          .orElseThrow(() -> new UserNotFoundException(id));
-    // }
+   
 
     @Override
     public User update(Long id, User userEdit) {

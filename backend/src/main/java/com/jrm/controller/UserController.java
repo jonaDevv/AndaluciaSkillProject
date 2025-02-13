@@ -66,7 +66,7 @@ public class UserController {
         user.setNombre(userDTO.getNombre());
         user.setUsername(userDTO.getUsername());
 
-        // Mapear specialtyId a un objeto Specialty
+        // Mapear specialtyId a un objeto Specialty=
         if (userDTO.getSpecialtyId() != null) {
             Specialty specialty = new Specialty();
             specialty.setId(userDTO.getSpecialtyId());
