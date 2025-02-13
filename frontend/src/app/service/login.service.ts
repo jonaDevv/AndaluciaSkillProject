@@ -70,20 +70,21 @@ export class LoginService {
     })
     .pipe(map((data:any)=>{
       //Analizar respuesta
-      let respuesta:boolean=false;
-      if(data.status == 200){
+      let respuesta:object={};
+      if(data!=null && data.token!=""){
 
 
         objeto.usuario={"nombre":data.user}
-        objeto.perfil = data.perfil;
-        objeto.logeado = true;
+        objeto.perfil = data.rol;
         objeto.token = data.token;
+        objeto.logeado = true;
         objeto.almacenar();
 
-        respuesta=true;
+        respuesta= {"funciona":true, "perfil":data.rol};
 
       }else{
-        respuesta=false;
+        
+        respuesta= {"funciona":false};
       }
 
       return respuesta;

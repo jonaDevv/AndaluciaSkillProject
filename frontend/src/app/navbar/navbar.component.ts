@@ -31,6 +31,7 @@ export class NavbarComponent {
     
     this.service.logout();
     this.nombre="";
+    this.router.navigate(['/'])
    
   }
 

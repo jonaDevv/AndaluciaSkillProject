@@ -55,7 +55,9 @@ public class UserController {
         if (userDto == null) {
             return ResponseEntity.badRequest().body("El cuerpo de la solicitud no puede ser nulo");
         }
+        
         User user = genericDto.genericConvert(userDto, User.class);
+
         user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId()).orElse(null));
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }

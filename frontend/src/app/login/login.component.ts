@@ -23,10 +23,15 @@ export class LoginComponent {
 
   logear():void{
     
-    this.login.login(this.usuario, this.clave).subscribe(()=>{  
-      
-      this.route.navigate(["/"]); 
+    this.login.login(this.usuario, this.clave).subscribe((v)=>{  
+      console.log(v);
+      if(v.funciona)
 
+        this.route.navigate(["/"+v.perfil]);
+
+      else
+
+        alert("Error en la autenticacion")
       
     });
 
