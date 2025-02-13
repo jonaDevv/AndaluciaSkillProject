@@ -9,6 +9,7 @@ import com.jrm.dto.user.UserCreateDTO;
 import com.jrm.dto.user.UserDTO;
 import com.jrm.dto.user.UserResponseDTO;
 import com.jrm.dto.user.UserUpdateDTO;
+import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.model.Specialty;
 import com.jrm.model.User;
 import com.jrm.service.SpecialtyService;
@@ -17,6 +18,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -54,34 +56,52 @@ public class UserController {
             return ResponseEntity.badRequest().body("El cuerpo de la solicitud no puede ser nulo");
         }
         User user = genericDto.genericConvert(userDto, User.class);
-        user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId()));
+        user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId()).orElse(null));
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
-        User user = userService.findById(id);
-        
-        user.setDni(userDTO.getDni());
-        user.setNombre(userDTO.getNombre());
-        user.setUsername(userDTO.getUsername());
+        Optional<User> user = userService.findById(id);
 
-        // Mapear specialtyId a un objeto Specialty=
-        if (userDTO.getSpecialtyId() != null) {
-            Specialty specialty = new Specialty();
-            specialty.setId(userDTO.getSpecialtyId());
-            user.setSpecialty(specialty);
-        }
+        user.ifPresentOrElse(u -> {
+            u.setDni(userDTO.getDni());
+            u.setNombre(userDTO.getNombre());
+            u.setUsername(userDTO.getUsername());
+
+            // Mapear specialtyId a un objeto Specialty=
+            if (userDTO.getSpecialtyId() != null) {
+                Specialty specialty = new Specialty();
+                specialty.setId(userDTO.getSpecialtyId());
+                u.setSpecialty(specialty);
+            }
+
+        }, ()-> ResponseEntity.notFound().build()); 
+
+        return ResponseEntity.ok(userService.update(id, user.get()));
         
-        return ResponseEntity.ok(userService.update(id, user));
+        // user.setDni(userDTO.getDni());
+        // user.setNombre(userDTO.getNombre());
+        // user.setUsername(userDTO.getUsername());
+
+        // // Mapear specialtyId a un objeto Specialty=
+        // if (userDTO.getSpecialtyId() != null) {
+        //     Specialty specialty = new Specialty();
+        //     specialty.setId(userDTO.getSpecialtyId());
+        //     user.setSpecialty(specialty);
+        // }
+        
+        // return ResponseEntity.ok(userService.update(id, user));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@Valid @PathVariable Long id) {
         try {
+
             userService.delete(id);
             return ResponseEntity.ok().build();
-        } catch (EntityNotFoundException e) {
+
+        } catch (ParticipantNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

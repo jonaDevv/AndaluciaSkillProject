@@ -51,8 +51,8 @@ public class UserService implements BaseService<User, Long> {
     
 
     @Override
-    public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 
     public Optional<User> findByIdd(Long id) {
@@ -69,7 +69,7 @@ public class UserService implements BaseService<User, Long> {
                     .nombre(user.getNombre())
                     .username(user.getUsername())
                     .password(passwordEncoder.encode(user.getPassword()))
-                    .specialty(specialtyService.findById(user.getSpecialty().getId()))
+                    .specialty(specialtyService.findById(user.getSpecialty().getId()).orElse(null))
                     .roles(user.getRoles())
                     .build();
 

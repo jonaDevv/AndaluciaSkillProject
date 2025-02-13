@@ -1,5 +1,7 @@
 package com.jrm.model;
 
+import java.util.Optional;
+
 import org.springframework.boot.autoconfigure.rsocket.RSocketProperties.Server.Spec;
 import org.springframework.validation.annotation.Validated;
 
@@ -37,7 +39,7 @@ public class Participant {
     private String center;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
-    private float maximumScore;
+    private float totalScore;
 
 
     @ManyToOne

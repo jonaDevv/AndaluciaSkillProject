@@ -28,6 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         
+        //Recoger del header el token
         String header = request.getHeader("Authorization");
         
         if (header == null || !header.startsWith("Bearer ")) {

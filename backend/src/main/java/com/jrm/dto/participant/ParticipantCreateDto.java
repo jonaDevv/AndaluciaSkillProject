@@ -26,7 +26,7 @@ public class ParticipantCreateDto {
     private String center;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
-    private float maximumScore;
+    private float totalScore;
 
 
     private Long specialtyId;

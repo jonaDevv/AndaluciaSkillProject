@@ -30,8 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
-		return userService.findById(id);
-        // .orElseThrow(() -> new UsernameNotFoundException( id +" no encontrado"));
+        
+		return userService.findById(id).orElseThrow(() -> new UsernameNotFoundException( id +" no encontrado"));
 		
 	}
 

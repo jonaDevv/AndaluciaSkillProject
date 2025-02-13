@@ -19,7 +19,7 @@ public class ParticipantResponseDto {
     private Long id;
     private String name;
     private String center;
-    private float maximumScore;
+    private float totalScore;
     private String specialtyName;
 
 

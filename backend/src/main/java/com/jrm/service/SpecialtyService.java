@@ -1,6 +1,7 @@
 package com.jrm.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -26,9 +27,9 @@ public class SpecialtyService implements BaseService<Specialty, Long> {
     }
 
     @Override
-    public Specialty findById(Long id) {
+    public Optional<Specialty> findById(Long id) {
        
-        return specialtyRepository.findById(id).orElse(null);
+        return specialtyRepository.findById(id);
     }
 
     @Override

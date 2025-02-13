@@ -9,6 +9,7 @@ import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.specialty.SpecialtyCreateDto;
 import com.jrm.dto.specialty.SpecialtyResponseDTO;
 import com.jrm.dto.specialty.SpecialtyUpdateDTO;
+import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.model.Specialty;
 import com.jrm.service.SpecialtyService;
 
@@ -76,7 +77,13 @@ public class SpecialtyController {
     // Eliminar una especialidad
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSpecialty(@PathVariable Long id) {
-        specialtyService.delete(id);
-        return ResponseEntity.noContent().build();
+        
+        try {
+            specialtyService.delete(id);
+            return ResponseEntity.ok().build();
+
+        } catch (SpecialtyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

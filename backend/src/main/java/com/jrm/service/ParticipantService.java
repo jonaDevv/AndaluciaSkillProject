@@ -1,6 +1,7 @@
 package com.jrm.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -27,9 +28,9 @@ public class ParticipantService implements BaseService <Participant,Long>{
     }
 
     @Override
-    public Participant findById(Long id) {
+    public Optional <Participant> findById(Long id){
         
-        return participantRepository.findById(id).orElse(null);
+        return participantRepository.findById(id);
     }
 
     @Override
@@ -40,8 +41,8 @@ public class ParticipantService implements BaseService <Participant,Long>{
             Participant.builder()
                         .name(participant.getName())
                         .center(participant.getCenter())
-                        .maximumScore(participant.getMaximumScore())
-                        .specialty(specialtyService.findById(participant.getSpecialty().getId()))
+                        .totalScore(participant.getTotalScore())
+                        .specialty(specialtyService.findById(participant.getSpecialty().getId()).orElse(null))
                         .build();
 
             return participantRepository.save(nuevoParticipante);
