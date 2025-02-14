@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.jrm.dto.converter.ConverterDto;
+import com.jrm.dto.participant.ParticipantCreateDto;
 import com.jrm.dto.participant.ParticipantResponseDto;
 import com.jrm.dto.participant.ParticipantUpdateDto;
+import com.jrm.error.ApiError;
 import com.jrm.error.participant.ParticipantNotFoundException;
+import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.model.Participant;
 import com.jrm.model.Specialty;
 import com.jrm.service.ParticipantService;
@@ -52,17 +55,30 @@ public class ParticipantController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    // Crear una nueva participante
     @PostMapping
-    public ResponseEntity<ParticipantResponseDto> createParticipant(
-            @Valid @RequestBody ParticipantResponseDto participantCreateDTO) {
-        
+    public ResponseEntity<?> createParticipant(
+            @Valid @RequestBody ParticipantCreateDto participantCreateDTO) {
+
+        // // 1. Validar si el DNI ya existe
+        // if (participantService.existsByDni(participantCreateDTO.getDni())) {
+        //     ApiError apiError = apiErrorService.getErrorMessage("El DNI " + participantCreateDTO.getDni() + " ya está registrado");
+        //     return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        // }
+
+        // 2. Convertir DTO a entidad
         Participant participant = genericDto.genericConvert(participantCreateDTO, Participant.class);
-        Participant savedParticipant = participantService.save(participant);
+
         
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(genericDto.genericConvert(savedParticipant, ParticipantResponseDto.class));
+        participant.setSpecialty(specialtyService.findById(participantCreateDTO.getSpecialtyId())
+        .orElseThrow(() -> new SpecialtyNotFoundException(participantCreateDTO.getSpecialtyId())));
+
+     
+
+        // 4. Guardar y retornar respuesta
+        Participant savedParticipant = participantService.save(participant);
+        ParticipantResponseDto responseDto = genericDto.genericConvert(savedParticipant, ParticipantResponseDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     // Actualizar una participante

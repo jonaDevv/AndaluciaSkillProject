@@ -94,18 +94,18 @@ public class SecurityConfig {
                 // Endpoints públicos
                 .requestMatchers(HttpMethod.POST,"/auth/login", "/auth/register").permitAll()
                 
-                // Solo ADMIN puede ver lista de Users
-                .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ROLE_ADMIN")
+                // // Solo ADMIN puede ver lista de Users
+                // .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ROLE_ADMIN")
+                // .requestMatchers(HttpMethod.PUT, "/users/**").hasAuthority("ROLE_ADMIN")
+                // .requestMatchers(HttpMethod.DELETE, "/users/**").hasAuthority("ROLE_ADMIN")
                 
                 // ADMIN y EXPERT pueden ver lista de Specialty
                 .requestMatchers(HttpMethod.GET, "/specialty").hasAnyAuthority("ROLE_ADMIN", "ROLE_EXPERT")
                 
                 // Operaciones de escritura (solo ADMIN)
                 .requestMatchers(HttpMethod.POST, "/participant","/users", "/specialty").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/participant/","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/participant/","/users", "/specialty/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
                 
                 // Cualquier otra solicitud requiere autenticación
                 .anyRequest().authenticated()

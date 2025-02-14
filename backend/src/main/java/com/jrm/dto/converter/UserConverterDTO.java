@@ -33,8 +33,8 @@ public class UserConverterDTO {
 	// }
 	
 
-    public UserDTO convert(User user) {
-        return modelMapper.map(user, UserDTO.class);
+    public UserResponseDTO convert(User user) {
+        return modelMapper.map(user, UserResponseDTO.class);
     }
 
 

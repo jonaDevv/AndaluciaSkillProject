@@ -53,13 +53,11 @@ public class UserController {
                          .map(ResponseEntity::ok)
                          .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
-        
-        if (userDto == null) {
-            return ResponseEntity.badRequest().body("El cuerpo de la solicitud no puede ser nulo");
-        }
+      
 
         if (userService.findByDni(userDto.getDni()).isPresent()) {
             ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
@@ -77,7 +75,11 @@ public class UserController {
         user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId())
                         .orElseThrow(() -> new SpecialtyNotFoundException(userDto.getSpecialtyId())));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
+        User savedUser = userService.save(user);
+        
+        UserResponseDTO responseDto = genericDto.genericConvert(savedUser, UserResponseDTO.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        
     }
 
     @PutMapping("/{id}")

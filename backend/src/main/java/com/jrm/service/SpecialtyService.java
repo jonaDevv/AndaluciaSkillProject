@@ -32,6 +32,10 @@ public class SpecialtyService implements BaseService<Specialty, Long> {
         return specialtyRepository.findById(id);
     }
 
+    public Optional<Specialty> findByCod(String cod) {
+        return specialtyRepository.findByCod(cod);
+    }
+
     @Override
     public Specialty save(Specialty specialty) {
       

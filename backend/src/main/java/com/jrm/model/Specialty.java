@@ -26,6 +26,7 @@ public class Specialty {
     private Long id;
 
     @NotNull(message = "El nombre del especialidad no puede ser nulo")
+    @Column(unique = true)
     private String cod;
 
     @Column(unique = true)

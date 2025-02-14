@@ -9,8 +9,10 @@ import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.specialty.SpecialtyCreateDto;
 import com.jrm.dto.specialty.SpecialtyResponseDTO;
 import com.jrm.dto.specialty.SpecialtyUpdateDTO;
+import com.jrm.error.ApiError;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.model.Specialty;
+import com.jrm.service.ApiErrorService;
 import com.jrm.service.SpecialtyService;
 
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ public class SpecialtyController {
 
     private final SpecialtyService specialtyService;
     private final ConverterDto genericDto;
+    private final ApiErrorService apiErrorService;
 
     // Obtener todas las especialidades
     @GetMapping
@@ -50,8 +53,13 @@ public class SpecialtyController {
 
     // Crear una nueva especialidad
     @PostMapping
-    public ResponseEntity<SpecialtyResponseDTO> createSpecialty(
+    public ResponseEntity<?> createSpecialty(
             @Valid @RequestBody SpecialtyCreateDto specialtyCreateDTO) {
+
+        if(specialtyService.findByCod(specialtyCreateDTO.getCod()).isPresent()){
+            ApiError apiError = apiErrorService.getErrorMessage("El código de la especialidad " + specialtyCreateDTO.getCod() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
         
         Specialty specialty = genericDto.genericConvert(specialtyCreateDTO, Specialty.class);
         Specialty savedSpecialty = specialtyService.save(specialty);
