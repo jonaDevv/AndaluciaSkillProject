@@ -33,13 +33,16 @@ public class SpecialtyController {
     // Obtener todas las especialidades
     @GetMapping
     public ResponseEntity<List<SpecialtyResponseDTO>> getAllSpecialties() {
-        List<SpecialtyResponseDTO> specialties = specialtyService.findAll().stream()
+       
+        List<Specialty> specialties = specialtyService.findAll();
+
+        return Optional.of(specialties) 
+                .filter(list -> !list.isEmpty())
+                .map(nomEmtyList -> nomEmtyList.stream()   
                 .map(s -> genericDto.genericConvert(s, SpecialtyResponseDTO.class))
-                .toList();
-        
-        return specialties.isEmpty() ? 
-            ResponseEntity.noContent().build() : 
-            ResponseEntity.ok(specialties);
+                .toList())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Obtener una especialidad por ID
@@ -68,18 +71,30 @@ public class SpecialtyController {
                 .body(genericDto.genericConvert(savedSpecialty, SpecialtyResponseDTO.class));
     }
 
-    // Actualizar una especialidad
+    // // Actualizar una especialidad
+    // @PutMapping("/{id}")
+    // public ResponseEntity<SpecialtyResponseDTO> updateSpecialty(@PathVariable Long id,@Valid @RequestBody SpecialtyUpdateDTO specialtyUpdateDTO) {
+        
+    //     Specialty specialtyUpdate = genericDto.genericConvert(specialtyUpdateDTO, Specialty.class);
+    //     Specialty updatedSpecialty = specialtyService.update(id, specialtyUpdate);
+        
+    //     return ResponseEntity.ok(genericDto.genericConvert(updatedSpecialty, SpecialtyResponseDTO.class)
+    //     );
+    // }
+
     @PutMapping("/{id}")
     public ResponseEntity<SpecialtyResponseDTO> updateSpecialty(
             @PathVariable Long id,
             @Valid @RequestBody SpecialtyUpdateDTO specialtyUpdateDTO) {
-        
+
         Specialty specialtyUpdate = genericDto.genericConvert(specialtyUpdateDTO, Specialty.class);
-        Specialty updatedSpecialty = specialtyService.update(id, specialtyUpdate);
-        
-        return ResponseEntity.ok(
-            genericDto.genericConvert(updatedSpecialty, SpecialtyResponseDTO.class)
-        );
+
+        // Intentamos actualizar la especialidad usando un Optional
+        return Optional.ofNullable(specialtyService.update(id, specialtyUpdate))
+                .filter(updatedSpecialty -> updatedSpecialty != null)  // Verificamos que la especialidad no sea null
+                .map(updatedSpecialty -> genericDto.genericConvert(updatedSpecialty, SpecialtyResponseDTO.class))  // Convertimos a DTO
+                .map(ResponseEntity::ok)  // Si se encuentra y se actualiza, devolvemos un 200 OK
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());  // Si no se encuentra, devolvemos un 404 Not Found
     }
 
     // Eliminar una especialidad

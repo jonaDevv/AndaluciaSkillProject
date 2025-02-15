@@ -35,15 +35,16 @@ public class ParticipantController {
     // Obtener todas las participantes
     @GetMapping
     public ResponseEntity<List<ParticipantResponseDto>> getAllParticipants() {
-        List<ParticipantResponseDto> participants = 
-        participantService
-                .findAll().stream()
-                .map(p -> genericDto.genericConvert(p, ParticipantResponseDto.class))
-                .toList();
-        
-        return participants.isEmpty() ? 
-            ResponseEntity.noContent().build() : 
-            ResponseEntity.ok(participants);
+        List<Participant> participants = participantService.findAll();
+                
+        return Optional.of(participants)
+                .filter(list -> !list.isEmpty())
+                .map(nonEmptyList -> nonEmptyList.stream()
+                    .map(p -> genericDto.genericConvert(p, ParticipantResponseDto.class))
+                    .toList())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
     // Obtener una participante por ID
@@ -55,17 +56,14 @@ public class ParticipantController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+
     @PostMapping
-    public ResponseEntity<?> createParticipant(
-            @Valid @RequestBody ParticipantCreateDto participantCreateDTO) {
+    public ResponseEntity<?> createParticipant(@Valid @RequestBody ParticipantCreateDto participantCreateDTO) {
 
-        // // 1. Validar si el DNI ya existe
-        // if (participantService.existsByDni(participantCreateDTO.getDni())) {
-        //     ApiError apiError = apiErrorService.getErrorMessage("El DNI " + participantCreateDTO.getDni() + " ya está registrado");
-        //     return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
-        // }
+        
 
-        // 2. Convertir DTO a entidad
+        //  Convertir DTO a entidad
         Participant participant = genericDto.genericConvert(participantCreateDTO, Participant.class);
 
         
@@ -74,7 +72,7 @@ public class ParticipantController {
 
      
 
-        // 4. Guardar y retornar respuesta
+        //  Guardar y retornar respuesta
         Participant savedParticipant = participantService.save(participant);
         ParticipantResponseDto responseDto = genericDto.genericConvert(savedParticipant, ParticipantResponseDto.class);
 

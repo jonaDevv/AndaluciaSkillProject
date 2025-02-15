@@ -37,13 +37,14 @@ public class UserController {
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         List<User> users = userService.findAll();
-        if (users.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        List<UserResponseDTO> userDTOs = users.stream()
-                                      .map(u-> genericDto.genericConvert(u, UserResponseDTO.class))
-                                      .toList();
-        return ResponseEntity.ok(userDTOs);
+        
+        return Optional.of(users)
+            .filter(list -> !list.isEmpty())
+            .map(nonEmptyList -> nonEmptyList.stream()
+                .map(u -> genericDto.genericConvert(u, UserResponseDTO.class))
+                .toList())
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")

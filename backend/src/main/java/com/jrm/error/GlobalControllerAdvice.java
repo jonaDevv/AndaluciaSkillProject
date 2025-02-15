@@ -2,6 +2,8 @@ package com.jrm.error;
 
 
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -30,7 +32,7 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(SpecialtyNotFoundException.class)
     public ResponseEntity<ApiError> handleSpecialtyNotFound(SpecialtyNotFoundException ex) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, null, ex.getMessage());
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
