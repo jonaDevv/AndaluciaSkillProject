@@ -29,12 +29,9 @@ public class TestUpdateDto {
     private String statement;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
-    private float totalScore;
+    private float maxScore;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    @Future(message = "La fecha debe de ser en el futuro")
-    private LocalDateTime date;
-
+  
    
     private Long specialtyId;
 

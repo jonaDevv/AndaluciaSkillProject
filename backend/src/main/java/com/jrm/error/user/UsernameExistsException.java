@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 @ResponseStatus(value = HttpStatus.CONFLICT)
 public class UsernameExistsException  extends RuntimeException {
 
-    public UsernameExistsException(String message) {
+    public UsernameExistsException() {
         super("El usuario ya existe");
     }
 

@@ -20,16 +20,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
-@Data  @AllArgsConstructor
-@NoArgsConstructor
-@Validated
 @Entity
+@Data
+@Builder
+@AllArgsConstructor
+@Validated
+@NoArgsConstructor
 public class Test {
 
     @Id
@@ -37,14 +39,13 @@ public class Test {
     private Long id;
 
     @NotNull(message = "El enunciado del especialidad no puede ser nulo")
+    @Pattern(regexp = "^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.,!?-]+$", 
+    message = "El enunciado solo puede contener letras, números y espacios")
     private String statement;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
-    private float totalScore;
+    private float maxScore;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    @Future(message = "La fecha debe de ser en el futuro")
-    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "specialty_id") 

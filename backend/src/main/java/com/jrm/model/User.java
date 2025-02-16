@@ -1,5 +1,6 @@
 package com.jrm.model;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ public class User implements UserDetails {
     private String dni;
 
 	@NotNull(message = "El nombre no puede ser nulo")
+	@Pattern(regexp = "^[a-zA-Z ]+$", message = "La descripcion solo debe contener letras")
     private String nombre;
 
 	@NotNull(message = "El username no puede ser nulo")

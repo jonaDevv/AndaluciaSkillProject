@@ -39,9 +39,9 @@ public class TestResponseDto {
    
     private String statement;
 
-    private float totalScore;
+    private float maxScore;
 
-    private LocalDateTime date;
+
 
     private String specialtyName;
 

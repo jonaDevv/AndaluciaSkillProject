@@ -72,8 +72,9 @@ public class UserService implements BaseService<User, Long> {
                     .nombre(user.getNombre())
                     .username(user.getUsername())
                     .password(passwordEncoder.encode(user.getPassword()))
-                    .specialty(specialtyService.findById(user.getSpecialty().getId())
-                    .orElseThrow(()-> new SpecialtyNotFoundException(user.getSpecialty().getId())))
+                    .specialty((user.getSpecialty() != null) 
+                ? specialtyService.findById(user.getSpecialty().getId()).orElseThrow(() -> new SpecialtyNotFoundException(user.getSpecialty().getId()))
+                    : null)
                     .roles(user.getRoles())
                     .build();
 

@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Entity
@@ -26,11 +27,13 @@ public class Specialty {
     private Long id;
 
     @NotNull(message = "El nombre del especialidad no puede ser nulo")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "El código solo debe contener letras")
     @Column(unique = true)
     private String cod;
 
     @Column(unique = true)
     @NotNull(message = "El nombre del especialidad no puede ser nulo")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "El nombre solo debe contener letras")
     private String name;
 
     // @OneToMany(mappedBy = "specialty")

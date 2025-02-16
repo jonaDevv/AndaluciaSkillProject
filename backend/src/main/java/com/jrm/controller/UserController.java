@@ -2,7 +2,10 @@ package com.jrm.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.converter.UserConverterDTO;
 import com.jrm.dto.user.UserCreateDTO;
@@ -12,6 +15,7 @@ import com.jrm.dto.user.UserUpdateDTO;
 import com.jrm.error.ApiError;
 import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
+import com.jrm.error.user.UserNotFoundException;
 import com.jrm.model.Specialty;
 import com.jrm.model.User;
 import com.jrm.service.ApiErrorService;
@@ -52,13 +56,13 @@ public class UserController {
         return userService.findByIdd(id)
                          .map(userConverterDTO::convert)
                          .map(ResponseEntity::ok)
-                         .orElseGet(() -> ResponseEntity.notFound().build());
+                         .orElseThrow(() -> new UserNotFoundException(id));
     }
     
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
-      
+        
 
         if (userService.findByDni(userDto.getDni()).isPresent()) {
             ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
@@ -85,47 +89,44 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
-        Optional<User> user = userService.findById(id);
-
-        user.ifPresentOrElse(u -> {
-            u.setDni(userDTO.getDni());
-            u.setNombre(userDTO.getNombre());
-            u.setUsername(userDTO.getUsername());
-
-            // Mapear specialtyId a un objeto Specialty=
-            if (userDTO.getSpecialtyId() != null) {
-                Specialty specialty = new Specialty();
-                specialty.setId(userDTO.getSpecialtyId());
-                u.setSpecialty(specialty);
-            }
-
-        }, ()-> ResponseEntity.notFound().build()); 
-
-        return ResponseEntity.ok(userService.update(id, user.get()));
         
-        // user.setDni(userDTO.getDni());
-        // user.setNombre(userDTO.getNombre());
-        // user.setUsername(userDTO.getUsername());
-
-        // // Mapear specialtyId a un objeto Specialty=
-        // if (userDTO.getSpecialtyId() != null) {
-        //     Specialty specialty = new Specialty();
-        //     specialty.setId(userDTO.getSpecialtyId());
-        //     user.setSpecialty(specialty);
-        // }
         
-        // return ResponseEntity.ok(userService.update(id, user));
+        return userService.findById(id)
+        .map(user -> {
+            // Actualizar campos básicos
+            user.setDni(userDTO.getDni());
+            user.setNombre(userDTO.getNombre());
+            user.setUsername(userDTO.getUsername());
+            
+            // Manejar specialty
+            Optional.ofNullable(userDTO.getSpecialtyId())
+                .ifPresent(specialtyId -> {
+                    
+                    user.setSpecialty(specialtyService.findById(specialtyId)
+                    .orElseThrow(() -> new SpecialtyNotFoundException(specialtyId)));
+                });
+            
+            // Guardar cambios y retornar el usuario actualizado
+            return userService.update(id, user); // ¡Aquí falta el return!
+        })
+        .map(userConverterDTO::convert)
+        .map(ResponseEntity::ok)
+        .orElseThrow(() -> new UserNotFoundException(id));
+
+       
+        
+       
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@Valid @PathVariable Long id) {
-        try {
-
-            userService.delete(id);
-            return ResponseEntity.ok().build();
-
-        } catch (ParticipantNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        
+        return userService.findById(id)
+        .map(u -> {
+            userService.delete(id); // Eliminar al usuario
+            return ResponseEntity.ok().build(); // Retornar una respuesta vacía con estado 200 OK
+        })
+        .orElseThrow(() -> new UserNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
     }
+
 }

@@ -10,4 +10,6 @@ public class SpecialtyNotFoundException extends RuntimeException {
 		super("No se encuentra la especialidad con id: " + id);
 	}
 
+	
+
 }

@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,13 +36,18 @@ public class Item {
     private Long id;
 
     @NotNull(message = "La descripcion no puede ser nula")
+    @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "El valor debe ser un alfanumérico")
     private String description;
 
     @NotNull
     @Positive(message = "El valor debe ser positivo")
+    @Pattern(regexp = "^\\d+$", message = "El código debe ser numérico")
     private int weight;
 
     @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
+    @Pattern(
+        regexp = "^[+-]?\\d+([.,]\\d+)?$", 
+        message = "El valor debe ser un número decimal válido ")
     private float percentage;
 
     // Relación N:1 con Test

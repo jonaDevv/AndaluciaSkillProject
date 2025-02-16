@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.model.Participant;
@@ -67,7 +68,7 @@ public class ParticipantService implements BaseService <Participant,Long>{
     public void delete(Long id) {
        
         Participant participant = participantRepository.findById(id)
-                                    .orElseThrow(() -> new UserNotFoundException(id));
+                                    .orElseThrow(() -> new ParticipantNotFoundException(id));
         participantRepository.delete(participant);
 
         

@@ -53,7 +53,7 @@ public class ParticipantController {
         return Optional.ofNullable(participantService.findById(id))
                 .map(p -> genericDto.genericConvert(p, ParticipantResponseDto.class))
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ParticipantNotFoundException(id));
     }
 
 
@@ -61,16 +61,11 @@ public class ParticipantController {
     @PostMapping
     public ResponseEntity<?> createParticipant(@Valid @RequestBody ParticipantCreateDto participantCreateDTO) {
 
-        
-
         //  Convertir DTO a entidad
         Participant participant = genericDto.genericConvert(participantCreateDTO, Participant.class);
 
-        
         participant.setSpecialty(specialtyService.findById(participantCreateDTO.getSpecialtyId())
         .orElseThrow(() -> new SpecialtyNotFoundException(participantCreateDTO.getSpecialtyId())));
-
-     
 
         //  Guardar y retornar respuesta
         Participant savedParticipant = participantService.save(participant);
@@ -84,20 +79,26 @@ public class ParticipantController {
     public ResponseEntity<?> updateParticipant(@Valid @PathVariable Long id,
             @Valid @RequestBody ParticipantUpdateDto participantUpdateDTO) {
         
-        Participant participant = participantService.findById(id).orElseThrow(() -> new ParticipantNotFoundException(id));
-
-        participant.setName(participantUpdateDTO.getName());
-        participant.setCenter(participantUpdateDTO.getCenter());
-        participant.setTotalScore(participantUpdateDTO.getTotalScore());
-        
-         // Mapear specialtyId a un objeto Specialty=
-         if (participantUpdateDTO.getSpecialtyId() != null) {
-            Specialty specialty = new Specialty();
-            specialty.setId(participantUpdateDTO.getSpecialtyId());
-            participant.setSpecialty(specialty);
-        }
-        
-        return ResponseEntity.ok(participantService.update(id, participant));
+        return participantService.findById(id)
+                .map(participant -> {
+                    // Actualizar campos básicos
+                    participant.setName(participantUpdateDTO.getName());
+                    participant.setCenter(participantUpdateDTO.getCenter());
+                    participant.setTotalScore(participantUpdateDTO.getTotalScore());
+                    
+                    // Manejar specialty
+                    Optional.ofNullable(participantUpdateDTO.getSpecialtyId())
+                            .ifPresent(specialtyId -> {
+                                participant.setSpecialty(specialtyService.findById(specialtyId)
+                                .orElseThrow(() -> new SpecialtyNotFoundException(specialtyId)));
+                            });
+                    
+                    // Guardar cambios y retornar el usuario actualizado
+                    return participantService.update(id, participant); // ¡Aquí falta el return!
+                })
+                .map(p->genericDto.genericConvert(p, ParticipantResponseDto.class))
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ParticipantNotFoundException(id));
         
     }
 
@@ -105,15 +106,14 @@ public class ParticipantController {
 
     // Eliminar una participante
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteParticipant(@PathVariable Long id) {
-        try {
-            
-            participantService.delete(id);
-            return ResponseEntity.ok().build();
-
-        } catch (ParticipantNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> deleteParticipant(@PathVariable Long id) {
+        
+        return participantService.findById(id)
+                .map(p -> {
+                    participantService.delete(id); // Eliminar al usuario
+                    return ResponseEntity.ok().build(); // Retornar una respuesta vacía con estado 200 OK
+                })
+                .orElseThrow(() -> new ParticipantNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
     }
 
 

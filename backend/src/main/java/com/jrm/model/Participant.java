@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,10 +33,11 @@ public class Participant {
     private Long id;
 
     @NotNull(message = "El nombre del participante no puede ser nulo")
-    
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "El nombre solo debe contener letras")
     private String name;
 
     @NotNull(message = "El cntro educativo no puede ser nulo")
+    @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "El nombre del centro debe ser un alfanumérico")
     private String center;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")

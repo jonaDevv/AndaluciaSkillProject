@@ -36,6 +36,10 @@ public class SpecialtyService implements BaseService<Specialty, Long> {
         return specialtyRepository.findByCod(cod);
     }
 
+    public Optional<Specialty> findByName(String name) {
+        return specialtyRepository.findByName(name);
+    }
+
     @Override
     public Specialty save(Specialty specialty) {
       
@@ -60,7 +64,7 @@ public class SpecialtyService implements BaseService<Specialty, Long> {
     public void delete(Long id) {
 
         Specialty specialty = specialtyRepository.findById(id)
-                                    .orElseThrow(() -> new UserNotFoundException(id));
+                                    .orElseThrow(() -> new SpecialtyNotFoundException(id));
         specialtyRepository.delete(specialty);
        
     }

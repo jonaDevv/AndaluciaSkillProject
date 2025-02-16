@@ -51,7 +51,7 @@ public class SpecialtyController {
         return Optional.ofNullable(specialtyService.findById(id))
                 .map(s -> genericDto.genericConvert(s, SpecialtyResponseDTO.class))
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new SpecialtyNotFoundException(id));
     }
 
     // Crear una nueva especialidad
@@ -63,6 +63,11 @@ public class SpecialtyController {
             ApiError apiError = apiErrorService.getErrorMessage("El código de la especialidad " + specialtyCreateDTO.getCod() + " ya existe");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
         }
+
+        if(specialtyService.findByName(specialtyCreateDTO.getName()).isPresent()){
+            ApiError apiError = apiErrorService.getErrorMessage("El nombre de la especialidad " + specialtyCreateDTO.getName() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
         
         Specialty specialty = genericDto.genericConvert(specialtyCreateDTO, Specialty.class);
         Specialty savedSpecialty = specialtyService.save(specialty);
@@ -71,16 +76,7 @@ public class SpecialtyController {
                 .body(genericDto.genericConvert(savedSpecialty, SpecialtyResponseDTO.class));
     }
 
-    // // Actualizar una especialidad
-    // @PutMapping("/{id}")
-    // public ResponseEntity<SpecialtyResponseDTO> updateSpecialty(@PathVariable Long id,@Valid @RequestBody SpecialtyUpdateDTO specialtyUpdateDTO) {
-        
-    //     Specialty specialtyUpdate = genericDto.genericConvert(specialtyUpdateDTO, Specialty.class);
-    //     Specialty updatedSpecialty = specialtyService.update(id, specialtyUpdate);
-        
-    //     return ResponseEntity.ok(genericDto.genericConvert(updatedSpecialty, SpecialtyResponseDTO.class)
-    //     );
-    // }
+   
 
     @PutMapping("/{id}")
     public ResponseEntity<SpecialtyResponseDTO> updateSpecialty(
@@ -94,19 +90,18 @@ public class SpecialtyController {
                 .filter(updatedSpecialty -> updatedSpecialty != null)  // Verificamos que la especialidad no sea null
                 .map(updatedSpecialty -> genericDto.genericConvert(updatedSpecialty, SpecialtyResponseDTO.class))  // Convertimos a DTO
                 .map(ResponseEntity::ok)  // Si se encuentra y se actualiza, devolvemos un 200 OK
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());  // Si no se encuentra, devolvemos un 404 Not Found
+                .orElseThrow(() -> new SpecialtyNotFoundException(id)); // Si no se encuentra, devolvemos un 404 Not Found
     }
 
     // Eliminar una especialidad
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpecialty(@PathVariable Long id) {
+    public ResponseEntity<?> deleteSpecialty(@PathVariable Long id) {
         
-        try {
-            specialtyService.delete(id);
-            return ResponseEntity.ok().build();
-
-        } catch (SpecialtyNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return specialtyService.findById(id)
+                .map(s -> {
+                    specialtyService.delete(id); // Eliminar al usuario
+                    return ResponseEntity.ok().build(); // Retornar una respuesta vacía con estado 200 OK
+                })
+                .orElseThrow(() -> new SpecialtyNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
     }
 }

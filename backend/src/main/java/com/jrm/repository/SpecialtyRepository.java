@@ -13,6 +13,8 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
 
     Optional<Specialty> findByCod(String cod);
 
+    Optional<Specialty> findByName(String name);
+
 
 
 }
