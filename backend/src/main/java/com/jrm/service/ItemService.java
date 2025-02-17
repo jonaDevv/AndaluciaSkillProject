@@ -34,13 +34,7 @@ public class ItemService implements BaseService<Item, Long> {
     @Override
     public Item save(Item item) {
         
-        return itemRepository.save(item)
-                .builder()
-                .description(item.getDescription())
-                .weight(item.getWeight())
-                .percentage(item.getPercentage())
-                .test(item.getTest())
-                .build();
+        return itemRepository.save(item);
     }
 
     @Override

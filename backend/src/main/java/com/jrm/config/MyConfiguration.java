@@ -17,6 +17,8 @@ public class MyConfiguration {
  
     }
 
+	
+
     /**
 	 * Configuración más ajustada.
 	 */

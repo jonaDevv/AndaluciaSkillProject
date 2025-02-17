@@ -100,10 +100,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/participant/**").hasAuthority("ROLE_EXPERT")
                 
                 // Operaciones de escritura (solo ADMIN)
-                .requestMatchers(HttpMethod.POST, "/test","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/test/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/test/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
-                
+                .requestMatchers(HttpMethod.GET, "item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.POST, "item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.PUT, "item/**","/prueba/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "item/**","/prueba/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
+               
                 // Cualquier otra solicitud requiere autenticación
                 .anyRequest().authenticated()
             )

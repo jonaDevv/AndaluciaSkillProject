@@ -1,4 +1,4 @@
-package com.jrm.dto.test;
+package com.jrm.dto.prueba;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,32 +10,41 @@ import org.springframework.validation.annotation.Validated;
 
 import com.jrm.model.Specialty;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+@Builder
+@Data  @AllArgsConstructor
+@NoArgsConstructor
 @Validated
-@NoArgsConstructor @AllArgsConstructor @Builder
-public class TestUpdateDto {
-
-    
-    private String statement;
-
-    @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
-    private float maxScore;
+public class PruebaResponseDto {
 
   
+    private Long id;
    
-    private Long specialtyId;
+    private String enunciado;
 
-     private List<Item> items = new ArrayList<>();
+    private float maxScore;
 
+
+
+    private String specialtyName;
+
+    private List<Item> items = new ArrayList<>();
 
 }

@@ -1,12 +1,11 @@
 package com.jrm.model;
 
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-import org.springframework.cglib.core.Local;
-import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.persistence.CascadeType;
@@ -18,30 +17,34 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Future;
+
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Entity
-@Data
 @Builder
+@Data 
+@Getter
+@Setter
 @AllArgsConstructor
-@Validated
 @NoArgsConstructor
-public class Test {
+@Validated
+@Entity
+public class Prueba {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull(message = "El enunciado del especialidad no puede ser nulo")
-    @Pattern(regexp = "^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.,!?-]+$", 
-    message = "El enunciado solo puede contener letras, números y espacios")
-    private String statement;
+    // @Pattern(regexp = "^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.,!?-]+$", 
+    // message = "El enunciado solo puede contener letras, números y espacios")
+    private String enunciado;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
     private float maxScore;
@@ -54,7 +57,7 @@ public class Test {
 
     // Relación 1:N con Item
     @OneToMany(
-        mappedBy = "test", // Nombre del campo en la entidad Item que mapea esta relación
+        mappedBy = "prueba", // Nombre del campo en la entidad Item que mapea esta relación
         cascade = CascadeType.ALL, // Propaga operaciones (save, delete) a los Items
         orphanRemoval = true // Elimina Items huérfanos (sin referencia a Test)
     )

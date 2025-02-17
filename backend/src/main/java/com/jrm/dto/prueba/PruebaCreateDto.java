@@ -1,4 +1,4 @@
-package com.jrm.dto.test;
+package com.jrm.dto.prueba;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jrm.model.Specialty;
 
 import jakarta.persistence.JoinColumn;
@@ -19,20 +20,27 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
 @Validated
-@NoArgsConstructor @AllArgsConstructor @Builder
-public class TestCreateDto {
+@Getter
+@Setter
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder
+public class PruebaCreateDto {
 
    
-    private String statement;
+    @NotNull(message = "El enunciado no puede ser nulo")
+    private String enunciado;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
     private float maxScore;
 
-    @NotNull(message = "EL ID de la especialidad no puede ser nulo")
+   @JsonProperty("specialtyId") 
     private Long specialtyId;
 
     @Builder.Default

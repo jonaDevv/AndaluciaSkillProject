@@ -33,6 +33,6 @@ public class ItemUpdateDto {
     private float percentage;
 
  
-    private Long testId;
+    private Long prueba;
 
 }

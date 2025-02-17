@@ -36,12 +36,12 @@ public class Item {
     private Long id;
 
     @NotNull(message = "La descripcion no puede ser nula")
-    @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "El valor debe ser un alfanumérico")
+    @Pattern(regexp = "^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.,!?-]+$", message = "El valor debe ser un alfanumérico")
     private String description;
 
     @NotNull
     @Positive(message = "El valor debe ser positivo")
-    @Pattern(regexp = "^\\d+$", message = "El código debe ser numérico")
+    @Pattern(regexp = "^\\d+$", message = "El peso debe ser numérico")
     private int weight;
 
     @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
@@ -52,8 +52,8 @@ public class Item {
 
     // Relación N:1 con Test
     @ManyToOne(fetch = FetchType.LAZY) // Carga perezosa por defecto
-    @JoinColumn(name = "test_id") // Nombre de la columna en la tabla Item
-    private Test test;
+    @JoinColumn(name = "prueba_id") // Nombre de la columna en la tabla Item
+    private Prueba prueba;
 
 
 

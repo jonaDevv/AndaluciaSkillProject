@@ -3,11 +3,15 @@ package com.jrm.error;
 
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,8 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.error.participant.ParticipantNotFoundException;
+import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
-import com.jrm.error.test.TestNotFoundException;
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.error.user.UsernameExistsException;
 
@@ -51,8 +55,8 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
 	
-	@ExceptionHandler(TestNotFoundException.class)
-    public ResponseEntity<ApiError> handleSpecialtyNotFound(TestNotFoundException ex) {
+	@ExceptionHandler(PruebaNotFoundException.class)
+    public ResponseEntity<ApiError> handleSpecialtyNotFound(PruebaNotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
@@ -65,6 +69,8 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
+
+   
 	
 	@ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiError> handleSpecialtyNotFound(ConstraintViolationException  ex) {
@@ -84,7 +90,10 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(status).headers(headers).body(apiError);
 	}
 
+    
+}
+
 	
 	
 
-}
+

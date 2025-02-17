@@ -27,6 +27,6 @@ public class ItemResponseDto {
     private float percentage;
 
  
-    private String testName;
+    private String pruebaName;
 
 }
