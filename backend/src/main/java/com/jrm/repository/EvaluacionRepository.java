@@ -3,10 +3,12 @@ package com.jrm.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.jrm.model.Participant;
+import com.jrm.model.Evaluacion;
 
 @Repository
-public interface ParticipantRepository extends JpaRepository<Participant, Long> {
-    
+public interface EvaluacionRepository extends JpaRepository<Evaluacion, Long> {
+
+
+
 
 }

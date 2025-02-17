@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.jrm.error.evaluacion.EvaluacionNotFoundException;
 import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.error.prueba.PruebaNotFoundException;
@@ -65,6 +66,21 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<ApiError> handleSpecialtyNotFound(ItemNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+    @ExceptionHandler(EvaluacionNotFoundException.class)
+    public ResponseEntity<ApiError> handleEvaluacionNotFound(EvaluacionNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<ApiError> handleItemNotFound(ItemNotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
