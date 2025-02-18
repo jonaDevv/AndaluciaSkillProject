@@ -1,105 +1,132 @@
 package com.jrm.controller;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import org.apache.catalina.connector.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.jrm.dto.UserDTO;
+import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.converter.UserConverterDTO;
+import com.jrm.dto.user.UserCreateDTO;
+import com.jrm.dto.user.UserDTO;
+import com.jrm.dto.user.UserResponseDTO;
+import com.jrm.dto.user.UserUpdateDTO;
+import com.jrm.error.ApiError;
+import com.jrm.error.participant.ParticipantNotFoundException;
+import com.jrm.error.specialty.SpecialtyNotFoundException;
+import com.jrm.error.user.UserNotFoundException;
+import com.jrm.model.Specialty;
 import com.jrm.model.User;
+import com.jrm.service.ApiErrorService;
+import com.jrm.service.SpecialtyService;
 import com.jrm.service.UserService;
-
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
 
-@Controller
+@RestController
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private final SpecialtyService specialtyService;
     private final UserConverterDTO userConverterDTO;
+    private final ConverterDto genericDto;
+    private final ApiErrorService apiErrorService;
 
-
-    /*  
-     *  GET /users
-     *  GET /users/:id
-     *  POST /users
-     *  PUT /users/:id
-     *  DELETE /users/:id
-     */
-
-
-    /*
-     * Obtener todos los usuarios
-     * 
-     * @return List<User>
-     */
-    @GetMapping("/user")
+    @GetMapping
     public ResponseEntity<?> getAllUsers() {
-       
-        return Optional.ofNullable(userService.findAll())
-            .filter(users -> !users.isEmpty()) // Filtramos si la lista está vacía
-            .map(users -> users.stream()
-                               .map(userConverterDTO::convert)
-                               .toList()) // Convertimos a UserDTO
-            .map(ResponseEntity::ok) // Si no está vacío, devolvemos ResponseEntity.ok()
-            .orElseGet(() -> ResponseEntity.notFound().build()); // Si está vacío, devolvemos 404
+        List<User> users = userService.findAll();
         
+        return Optional.of(users)
+            .filter(list -> !list.isEmpty())
+            .map(nonEmptyList -> nonEmptyList.stream()
+                .map(u -> genericDto.genericConvert(u, UserResponseDTO.class))
+                .toList())
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-
-            // Creamos un Stream de un solo elemento (el usuario)
-        return Stream.of(userService.findById(id))
-        .filter(Objects::nonNull) // Filtramos si el usuario es nulo
-        .map(user -> userConverterDTO.convert(user)) // Convertimos a UserDTO
-        .map(ResponseEntity::ok) // Envolvemos en ResponseEntity.ok
-        .findFirst() // Tomamos el primer (y único) valor
-        .orElseGet(() -> ResponseEntity.notFound().build()); // Si no se encuentra, devolvemos 404
-            
-    }
-
-    @PostMapping("/user")
-    public User createUser(@RequestBody User user) {
-        
-        return userService.save(user);
-    }
-
-    @PutMapping("/user/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.update(id, user);
-    }
-
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-
-
-        try {
-            userService.delete(id);  // Intentamos eliminar al usuario
-
-            return ResponseEntity.ok().build();  // 200 OK si se eliminó con éxito
-       
-        } catch (EntityNotFoundException e) {
-            
-            return ResponseEntity.notFound().build();  // 404 Not Found si no existe el usuario
-        }
-        
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@Valid @PathVariable Long id) {
+        return userService.findByIdd(id)
+                         .map(userConverterDTO::convert)
+                         .map(ResponseEntity::ok)
+                         .orElseThrow(() -> new UserNotFoundException(id));
     }
     
 
+    @PostMapping
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
+        
 
+        if (userService.findByDni(userDto.getDni()).isPresent()) {
+            ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+
+    
+        if (userService.findByUsername(userDto.getUsername()).isPresent()) {
+            ApiError apiError = apiErrorService.getErrorMessage("El usuario " + userDto.getUsername() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+        
+        User user = genericDto.genericConvert(userDto, User.class);
+
+        user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId())
+                        .orElseThrow(() -> new SpecialtyNotFoundException(userDto.getSpecialtyId())));
+
+        User savedUser = userService.save(user);
+        
+        UserResponseDTO responseDto = genericDto.genericConvert(savedUser, UserResponseDTO.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
+        
+        
+        return userService.findById(id)
+        .map(user -> {
+            // Actualizar campos básicos
+            user.setDni(userDTO.getDni());
+            user.setNombre(userDTO.getNombre());
+            user.setUsername(userDTO.getUsername());
+            
+            // Manejar specialty
+            Optional.ofNullable(userDTO.getSpecialtyId())
+                .ifPresent(specialtyId -> {
+                    
+                    user.setSpecialty(specialtyService.findById(specialtyId)
+                    .orElseThrow(() -> new SpecialtyNotFoundException(specialtyId)));
+                });
+            
+            // Guardar cambios y retornar el usuario actualizado
+            return userService.update(id, user); // ¡Aquí falta el return!
+        })
+        .map(userConverterDTO::convert)
+        .map(ResponseEntity::ok)
+        .orElseThrow(() -> new UserNotFoundException(id));
+
+       
+        
+       
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@Valid @PathVariable Long id) {
+        
+        return userService.findById(id)
+        .map(u -> {
+            userService.delete(id); // Eliminar al usuario
+            return ResponseEntity.ok().build(); // Retornar una respuesta vacía con estado 200 OK
+        })
+        .orElseThrow(() -> new UserNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
+    }
 
 }
