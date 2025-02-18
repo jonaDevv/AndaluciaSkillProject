@@ -76,7 +76,7 @@ public class UserController {
         }
         
         User user = genericDto.genericConvert(userDto, User.class);
-
+        
         user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId())
                         .orElseThrow(() -> new SpecialtyNotFoundException(userDto.getSpecialtyId())));
 

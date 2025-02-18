@@ -1,22 +1,22 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { ExpertService } from '../service/expert.service';
+import { Component, TemplateRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-var bootstrap = require('bootstrap');
+import { ExpertService } from '../service/expert.service';
+
 @Component({
   selector: 'app-expert',
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './expert.component.html',
-  imports: [CommonModule,RouterModule,FormsModule],
   styleUrls: ['./expert.component.css']
 })
 export class ExpertComponent {
   listExpert: any[] = [];
-  experto = { id: null, dni: '', nombre: '', username: '', especialidad: '' };
+  experto = { id: null, dni: '', nombre: '', username: '', password: '', specialtyId: '' };
   isEditing = false;  // Para saber si estamos editando un experto o agregando uno nuevo
 
-  constructor(private exper: ExpertService) {}
+  constructor(private exper: ExpertService, private modalService: NgbModal) {}
 
   ngOnInit() {
     this.exper.getAll().subscribe((res: any[]) => {
@@ -37,65 +37,54 @@ export class ExpertComponent {
   }
 
   // Abrir el modal para agregar un nuevo experto
-  abrirFormulario() {
-    this.experto = { id: null, dni: '', nombre: '', username: '', especialidad: '' }; // Limpiar los campos
-    this.isEditing = false;
-    const modal = new bootstrap.Modal(document.getElementById('modalFormulario'));
-    modal.show();
+  abrirFormulario(modalContent: TemplateRef<any>) {
+    this.experto = { id: null, dni: '', nombre: '', username: '',password: '', specialtyId:'' };  // Limpiar los campos
+    this.isEditing = false;  // Se asume que es agregar un nuevo experto
+    this.modalService.open(modalContent);  // Abrimos el modal con el contenido
   }
 
-  
-
+  // Guardar experto
   guardarExperto() {
     if (this.isEditing) {
-      // Si estamos editando, actualizamos el experto
       this.exper.updateUser(this.experto).subscribe(updated => {
         if (updated) {
-          // Reemplazamos el experto en la lista con el actualizado
           const index = this.listExpert.findIndex(ex => ex.id === updated.id);
           if (index !== -1) {
             this.listExpert[index] = updated;
           }
         } else {
-          // Si hay un error, puedes mostrar un mensaje o manejarlo como prefieras
           console.error('No se pudo actualizar el experto.');
         }
       });
     } else {
-      // Si no estamos editando, agregamos un nuevo experto
       this.exper.addUser(this.experto).subscribe(newExpert => {
         if (newExpert) {
-          // Si el experto se agrega correctamente, lo añadimos a la lista
           this.listExpert.push(newExpert);
         } else {
-          // Si hay un error al agregar, muestra un mensaje
           console.error('No se pudo agregar el nuevo experto.');
         }
       });
     }
-    this.cerrarFormulario();  // Cierra el modal después de agregar o editar
-  }
-  
 
-  // Cerrar el modal
-  cerrarFormulario() {
-    const modal = new bootstrap.Modal(document.getElementById('modalFormulario'));
-    modal.hide();
+    this.modalService.dismissAll();
+    
   }
 
   // Eliminar un experto
   delete(id: string) {
     this.exper.deleteUser(id).subscribe(() => {
       this.listExpert = this.listExpert.filter(expert => expert.id !== id);
-      console.log("Eliminado experto con ID:", id);
     });
   }
 
   // Editar un experto
-  editarExperto(expert: any) {
-    this.experto = { ...expert }; // Copiar los datos del experto seleccionado
+  editarExperto(expert: any, modalContent: TemplateRef<any>) {
+    this.experto = { ...expert };  // Copiar los datos del experto seleccionado
     this.isEditing = true;
-    const modal = new bootstrap.Modal(document.getElementById('modalFormulario'));
-    modal.show();
+    this.modalService.open(modalContent);  // Abrimos el modal para editar
+  }
+
+  cerrarModal(modal: NgbModal) {
+    this.modalService.dismissAll();
   }
 }

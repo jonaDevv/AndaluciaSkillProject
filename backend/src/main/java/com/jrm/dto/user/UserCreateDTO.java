@@ -36,6 +36,6 @@ public class UserCreateDTO {
     private Long specialtyId;
 
    
-     private Set<UserRole> roles;
+     private Set<UserRole> roles = Set.of(UserRole.EXPERT);
 
 }

@@ -3,7 +3,7 @@
 
     <!-- Botón para abrir el formulario para agregar un nuevo experto -->
     <div class="mb-3 text-right">
-        <button class="btn btn-primary" (click)="abrirFormulario()">Nuevo</button>
+        <button class="btn btn-primary" (click)="abrirFormulario(modalContent)">Nuevo</button>
     </div>
 
     <!-- Tabla de Expertos -->
@@ -20,48 +20,50 @@
         </thead>
         <tbody>
             <tr *ngFor="let ex of listExpert">
-                <td>{{ex.id}}</td>
-                <td>{{ex.dni}}</td>
-                <td>{{ex.nombre}}</td>
-                <td>{{ex.username}}</td>
-                <td>{{ex.especialidad}}</td>
+                <td>{{ ex.id }}</td>
+                <td>{{ ex.dni }}</td>
+                <td>{{ ex.nombre }}</td>
+                <td>{{ ex.username }}</td>
+                <td>{{ ex.specialtyName }}</td>
                 <td>
-                    <!-- Botones de acción de editar y eliminar -->
-                    <button class="btn btn-warning btn-sm" >Editar</button>
+                    <button class="btn btn-warning btn-sm" (click)="editarExperto(ex, modalContent)">Editar</button>
                     <button class="btn btn-danger btn-sm" (click)="delete(ex.id)">Eliminar</button>
                 </td>
             </tr>
         </tbody>
     </table>
-    <div class="modal fade" id="modalFormulario" tabindex="-1" aria-labelledby="modalFormularioLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalFormularioLabel">{{ isEditing ? 'Editar Experto' : 'Agregar Experto' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form (ngSubmit)="guardarExperto()">
-                        <div class="mb-3">
-                            <label for="dni" class="form-label">DNI</label>
-                            <input type="text" id="dni" class="form-control" [(ngModel)]="experto.dni" name="dni" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" id="nombre" class="form-control" [(ngModel)]="experto.nombre" name="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" id="username" class="form-control" [(ngModel)]="experto.username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="especialidad" class="form-label">Especialidad</label>
-                            <input type="text" id="especialidad" class="form-control" [(ngModel)]="experto.especialidad" name="especialidad" required>
-                        </div>
-                        <button type="submit" class="btn btn-success">{{ isEditing ? 'Guardar Cambios' : 'Agregar Experto' }}</button>
-                    </form>
-                </div>
-            </div>
+
+    <!-- Modal Template -->
+    <ng-template #modalContent let-modal>
+        <div class="modal-header bg-dark"></div>
+        <div class="modal-header">
+            <h5 class="modal-title" id="modalFormularioLabel">{{ isEditing ? 'Editar Experto' : 'Agregar Experto' }}</h5>
+            <button type="button" class="btn-close" (click)="modal.close()"></button>
         </div>
-    </div>
+        <div class="modal-body">
+            <form (ngSubmit)="guardarExperto()">
+                <div class="mb-3">
+                    <label for="dni" class="form-label">DNI</label>
+                    <input type="text" id="dni" class="form-control" [(ngModel)]="experto.dni" name="dni" required>
+                </div>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" id="nombre" class="form-control" [(ngModel)]="experto.nombre" name="nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" [(ngModel)]="experto.username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Pasword</label>
+                    <input type="text" id="username" class="form-control" [(ngModel)]="experto.password" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="especialidad" class="form-label">Especialidad</label>
+                    <input type="text" id="especialidad" class="form-control" [(ngModel)]="experto.specialtyId" name="especialidad" required>
+                </div>
+                <button type="submit" class="btn btn-success">{{ isEditing ? 'Guardar Cambios' : 'Agregar Experto' }}</button>
+            </form>
+        </div>
+    </ng-template>
 </div>
