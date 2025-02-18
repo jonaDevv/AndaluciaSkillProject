@@ -75,12 +75,12 @@ export class LoginService {
 
 
         objeto.usuario={"nombre":data.username}
-        objeto.perfil = data.roles[0];
+        objeto.perfil = data.roles[0].toLowerCase();
         objeto.token = data.token;
         objeto.logeado = true;
         objeto.almacenar();
 
-        respuesta= {"funciona":true, "perfil":data.roles};
+        respuesta= {"funciona":true, "perfil":data.roles[0].toLowerCase()};
 
       }else{
         

@@ -60,13 +60,16 @@ public class ParticipantController {
 
     @PostMapping
     public ResponseEntity<?> createParticipant(@Valid @RequestBody ParticipantCreateDto participantCreateDTO) {
-
-        //  Convertir DTO a entidad
+        
         Participant participant = genericDto.genericConvert(participantCreateDTO, Participant.class);
 
-        participant.setSpecialty(specialtyService.findById(participantCreateDTO.getSpecialtyId())
-        .orElseThrow(() -> new SpecialtyNotFoundException(participantCreateDTO.getSpecialtyId())));
+        Specialty specialty = specialtyService.findById(participantCreateDTO.getSpecialty())
+                .orElseThrow(() -> new SpecialtyNotFoundException(participantCreateDTO.getSpecialty()));
+        //  Convertir DTO a entidad
 
+        // participant.setSpecialty(specialtyService.findById(participantCreateDTO.getSpecialtyId())
+        // .orElseThrow(() -> new SpecialtyNotFoundException(participantCreateDTO.getSpecialtyId())));
+        participant.setSpecialty(specialty);
         //  Guardar y retornar respuesta
         Participant savedParticipant = participantService.save(participant);
         ParticipantResponseDto responseDto = genericDto.genericConvert(savedParticipant, ParticipantResponseDto.class);

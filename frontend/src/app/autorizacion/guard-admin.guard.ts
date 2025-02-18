@@ -9,7 +9,7 @@ export const guardAdminGuard: CanActivateFn = (route, state) => {
       let service= inject(LoginService);
       let ruta=inject(Router);
 
-      if(service.getPerfil()=="ADMIN")
+      if(service.getPerfil()=="admin")
           respuesta=true
       else
       ruta.navigate(['login'])

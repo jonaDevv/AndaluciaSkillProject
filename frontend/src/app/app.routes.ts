@@ -5,11 +5,28 @@ import { AdminComponent } from './admin/admin.component';
 import { ExpertComponent } from './expert/expert.component';
 import { guardAdminGuard } from './autorizacion/guard-admin.guard';
 import { guardExpertGuard } from './autorizacion/guard-expert.guard';
+import { ListaParticipantesComponent } from './lista-participantes/lista-participantes.component';
 
 export const routes: Routes = [
 
-    { path: '', component: ListaCompetidoresComponent, pathMatch: 'full' },
+    { path: '', component: ListaParticipantesComponent, pathMatch: 'full' },
     { path: 'login', component: LoginComponent, pathMatch: 'full' },
-    { path: 'EXPERT', component: ExpertComponent,canActivate: [guardExpertGuard], pathMatch: 'full' },
-    { path: 'ADMIN', component: AdminComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
+    { path: 'expert', component: ExpertComponent,canActivate: [guardExpertGuard], pathMatch: 'full',
+        children: [
+            { path: 'competidores', component: ListaParticipantesComponent, pathMatch: 'full' },
+            { path: 'pruebas', component: ExpertComponent, pathMatch: 'full' },
+            { path: 'evaluaciones', component: ExpertComponent, pathMatch: 'full' },
+           
+        ]   
+     },
+    { path: 'admin', canActivate: [guardAdminGuard],
+        children: [
+
+            { path: 'expertos', component:AdminComponent ,canActivate: [guardAdminGuard] },
+            { path: 'ganadores', component: AdminComponent, canActivate: [guardAdminGuard],pathMatch: 'full' },
+            { path: 'especialidad', component: AdminComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
+           
+        ]
+    },
+    
 ];

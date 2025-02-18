@@ -2,7 +2,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <!-- Logo y nombre de la aplicación -->
       <a class="navbar-brand" href="#" style="font-family: 'San Francisco', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; font-weight: bold; color: white;">
-        Mi Aplicación
+           <!-- Andalucia Skills -->
       </a>
       <!-- Botón para el menú en dispositivos pequeños -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,19 +11,24 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <!-- Lista de navegación principal (a la izquierda) -->
         <ul class="navbar-nav">
-          <li class="nav-item" *ngIf="isLogged() && perfil == 'ADMIN'">
-            <a class="nav-link text-light" href="#">Perfil Admin</a>
+          <!-- Para el perfil ADMIN -->
+          <li class="nav-item" *ngIf="isLogged() && perfil == 'admin'">
+            <a class="nav-link text-light" [routerLink]="['/admin/expertos']">Expertos</a>
           </li>
-          <li class="nav-item" *ngIf="isLogged() && perfil == 'ADMIN'">
-            <a class="nav-link text-light" href="#">Pruebas Admin</a>
+          <li class="nav-item" *ngIf="isLogged() && perfil == 'admin'">
+            <a class="nav-link text-light" [routerLink]="['/admin/especialidad']">Especialidades</a>
           </li>
-          <li class="nav-item" *ngIf="isLogged() && perfil == 'EXPERT'">
-            <a class="nav-link text-light" href="#">Perfil Experto</a>
+          <li class="nav-item" *ngIf="isLogged() && perfil == 'admin'">
+            <a class="nav-link text-light" [routerLink]="['/admin/ganadores']">Ganadores</a>
           </li>
-          <li class="nav-item" *ngIf="isLogged() && perfil == 'EXPERT'">
-            <a class="nav-link text-light" href="#">Pruebas Experto</a>
+        
+          <!-- Para el perfil EXPERT -->
+          <li class="nav-item" *ngIf="isLogged() && perfil == 'expert'">
+            <a class="nav-link text-light" [routerLink]="['/expert/competidores']">Competidores</a>
           </li>
-          
+          <li class="nav-item" *ngIf="isLogged() && perfil == 'expert'">
+            <a class="nav-link text-light" [routerLink]="['/EXPERT/pruebas']">Pruebas</a>
+          </li>
         </ul>
   
         <!-- Lista de navegación secundaria (a la derecha) -->

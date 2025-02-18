@@ -8,7 +8,7 @@ export const guardExpertGuard: CanActivateFn = (route, state) => {
     let service= inject(LoginService);
     let ruta=inject(Router)
 
-    if(service.getPerfil()=="EXPERT")
+    if(service.getPerfil()=="expert")
         respuesta=true
       else
       ruta.navigate(['login'])

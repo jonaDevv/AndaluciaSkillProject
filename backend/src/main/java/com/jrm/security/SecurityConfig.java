@@ -94,8 +94,11 @@ public class SecurityConfig {
                 // Endpoints públicos
                 .requestMatchers(HttpMethod.POST,"/auth/login", "/auth/register").permitAll()
                 
-                
-                .requestMatchers(HttpMethod.GET, "/participant").hasAuthority("ROLE_EXPERT")
+                .requestMatchers("swagger-ui.html").permitAll()
+                .requestMatchers("swagger-ui/**").permitAll()
+                .requestMatchers("swagger-resources/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/participant").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/participant/**").hasAuthority("ROLE_EXPERT")
                 .requestMatchers(HttpMethod.DELETE, "/participant/**").hasAuthority("ROLE_EXPERT")
                 

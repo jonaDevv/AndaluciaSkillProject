@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LoginService } from '../service/login.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [ CommonModule],
+  imports: [ CommonModule,RouterModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })

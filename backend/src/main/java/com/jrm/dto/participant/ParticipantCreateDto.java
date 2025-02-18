@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class ParticipantCreateDto {
 
-     @NotNull(message = "El nombre del participante no puede ser nulo")
     
     private String name;
 
@@ -29,7 +28,7 @@ public class ParticipantCreateDto {
     private float totalScore;
 
 
-    private Long specialtyId;
+    private Long specialty;
 
 
 

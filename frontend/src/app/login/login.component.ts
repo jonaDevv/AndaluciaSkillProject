@@ -24,7 +24,7 @@ export class LoginComponent {
   logear():void{
     
     this.login.login(this.usuario, this.clave).subscribe((v)=>{  
-      console.log(v);
+      // console.log(v);
       if(v.funciona)
 
         this.route.navigate(["/"+v.perfil]);

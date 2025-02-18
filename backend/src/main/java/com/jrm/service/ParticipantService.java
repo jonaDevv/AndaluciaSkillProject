@@ -40,22 +40,24 @@ public class ParticipantService implements BaseService <Participant,Long>{
     @Override
     public Participant save(Participant participant) {
        
-        try {
-            Participant nuevoParticipante = 
-            Participant.builder()
-                        .name(participant.getName())
-                        .center(participant.getCenter())
-                        .totalScore(participant.getTotalScore())
-                        .specialty(specialtyService.findById(participant.getSpecialty().getId())
-                        .orElseThrow(()-> new SpecialtyNotFoundException(participant.getSpecialty().getId())))
-                        .build();
+        // try {
+        //     Participant nuevoParticipante = 
+        //     Participant.builder()
+        //                 .name(participant.getName())
+        //                 .center(participant.getCenter())
+        //                 .totalScore(participant.getTotalScore())
+        //                 .specialty(specialtyService.findById(participant.getSpecialty().getId())
+        //                 .orElseThrow(()-> new SpecialtyNotFoundException(participant.getSpecialty().getId())))
+        //                 .build();
 
-            return participantRepository.save(nuevoParticipante);
+        //     return participantRepository.save(nuevoParticipante);
 
-        } catch (Exception e) {
+        // } catch (Exception e) {
            
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al crear el participante");
-        }
+        //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error al crear el participante");
+        // }
+
+        return participantRepository.save(participant);
     }
 
     @Override
