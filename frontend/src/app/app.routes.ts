@@ -21,8 +21,8 @@ export const routes: Routes = [
      },
     { path: 'admin', canActivate: [guardAdminGuard],
         children: [
-
-            { path: 'expertos', component:AdminComponent ,canActivate: [guardAdminGuard] },
+            { path: '', component:AdminComponent ,canActivate: [guardAdminGuard], pathMatch: 'full' },
+            { path: 'expertos', component:ExpertComponent ,canActivate: [guardAdminGuard] },
             { path: 'ganadores', component: AdminComponent, canActivate: [guardAdminGuard],pathMatch: 'full' },
             { path: 'especialidad', component: AdminComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
            

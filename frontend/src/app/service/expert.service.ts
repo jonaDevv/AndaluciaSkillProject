@@ -12,7 +12,7 @@ export class ExpertService {
   header : any;
   constructor(private http: HttpClient, private loginser : LoginService) {
 
-     this.token = loginser.token;
+     this.token = loginser.getToken();
 
   }
 
@@ -42,7 +42,7 @@ export class ExpertService {
   // }
 
   getAll(): Observable<any[]> {
-
+    console.log(this.token)
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.token}`
     });
@@ -58,6 +58,45 @@ export class ExpertService {
       })
     );
     
+  }
+
+  addUser(experto: any): Observable<any> {
+    // Configurar el encabezado con el token de autorización
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    });
+  
+    // Hacer la solicitud POST al servidor con los datos del nuevo experto
+    return this.http.post<any>('http://localhost:8080/users', experto, { headers }).pipe(
+      map((newExpert) => {
+        console.log('Nuevo experto agregado:', newExpert);
+        return newExpert;  // Devuelve el experto recién creado
+      }),
+      catchError(error => {
+        console.error('Error al agregar el experto:', error);
+        return of(null);  // Devuelve null si hay un error
+      })
+    );
+  }
+  
+
+  updateUser(experto: any): Observable<any> {
+    // Configurar el encabezado con el token de autorización
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    });
+  
+    // Hacer la solicitud PUT al servidor con los datos del experto
+    return this.http.put<any>(`http://localhost:8080/users/${experto.id}`, experto, { headers }).pipe(
+      map((updatedExpert) => {
+        console.log('Experto actualizado:', updatedExpert);
+        return updatedExpert;
+      }),
+      catchError(error => {
+        console.error('Error actualizando experto:', error);
+        return of(null);  // Devuelve null si hay un error
+      })
+    );
   }
 
   deleteUser(id : String):any{

@@ -152,6 +152,19 @@ export class LoginService {
   }
 
 
+  getToken(){
+    let respuesta:string="";
+    let contenido:string|null = sessionStorage.getItem("LOGIN");  
+    
+    if(contenido)
+    {
+      console.log(JSON.parse(contenido||"").token)
+      respuesta= JSON.parse(contenido||"").token;
+    }
+    return respuesta;
+  }
+
+
 
 
 
