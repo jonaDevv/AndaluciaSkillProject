@@ -71,10 +71,6 @@ export class ExpertService {
       map((newExpert) => {
         console.log('Nuevo experto agregado:', newExpert);
         return newExpert;  // Devuelve el experto recién creado
-      }),
-      catchError(error => {
-        console.error('Error al agregar el experto:', error);
-        return of(null);  // Devuelve null si hay un error
       })
     );
   }
@@ -91,23 +87,15 @@ export class ExpertService {
       map((updatedExpert) => {
         console.log('Experto actualizado:', updatedExpert);
         return updatedExpert;
-      }),
-      catchError(error => {
-        console.error('Error actualizando experto:', error);
-        return of(null);  // Devuelve null si hay un error
       })
     );
   }
 
-  deleteUser(id : String):any{
-    
+  deleteUser(id: string): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.token}`
     });
-    
-    this.http.delete('http://localhost:8080/users/' + id, { headers })
-             .subscribe(res => {
-                          console.log(res);
-    });
+  
+    return this.http.delete('http://localhost:8080/users/' + id, { headers });
   }
 }

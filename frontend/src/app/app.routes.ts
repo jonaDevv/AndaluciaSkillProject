@@ -6,6 +6,7 @@ import { ExpertComponent } from './expert/expert.component';
 import { guardAdminGuard } from './autorizacion/guard-admin.guard';
 import { guardExpertGuard } from './autorizacion/guard-expert.guard';
 import { ListaParticipantesComponent } from './lista-participantes/lista-participantes.component';
+import { EspecialidadComponent } from './especialidad/especialidad.component';
 
 export const routes: Routes = [
 
@@ -21,10 +22,10 @@ export const routes: Routes = [
      },
     { path: 'admin', canActivate: [guardAdminGuard],
         children: [
-            { path: '', component:AdminComponent ,canActivate: [guardAdminGuard], pathMatch: 'full' },
+            { path: '', redirectTo: 'expertos', pathMatch: 'full' },
             { path: 'expertos', component:ExpertComponent ,canActivate: [guardAdminGuard] },
             { path: 'ganadores', component: AdminComponent, canActivate: [guardAdminGuard],pathMatch: 'full' },
-            { path: 'especialidad', component: AdminComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
+            { path: 'especialidad', component:EspecialidadComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
            
         ]
     },

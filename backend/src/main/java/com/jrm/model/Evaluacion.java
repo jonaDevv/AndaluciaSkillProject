@@ -38,11 +38,11 @@ public class Evaluacion {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "participant_id") 
+    @JoinColumn(name = "participant_id", nullable=true) 
     private Participant participant;
 
     @ManyToOne
-    @JoinColumn(name = "prueba_id") 
+    @JoinColumn(name = "prueba_id", nullable=true) 
     private Prueba prueba;
    
 

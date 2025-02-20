@@ -1,9 +1,24 @@
 <div id="contenedorListaCompetidores" class="container mt-5">
     <h1 class="text-center mb-4">Lista de Expertos</h1>
+    <div class="mb-3">
+        <label for="search" class="form-label">Buscar por Nombre</label>
+        <input 
+            type="text" 
+            id="search" 
+            class="form-control" 
+            [(ngModel)]="searchText" 
+            placeholder="Escribe el nombre para filtrar"
+        />
+    </div>
 
     <!-- Botón para abrir el formulario para agregar un nuevo experto -->
     <div class="mb-3 text-right">
         <button class="btn btn-primary" (click)="abrirFormulario(modalContent)">Nuevo</button>
+    </div>
+
+    <!-- Mostrar mensaje de error si existe -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
     </div>
 
     <!-- Tabla de Expertos -->
@@ -14,12 +29,12 @@
                 <th scope="col" (click)="ordenarPor('dni')">DNI</th>
                 <th scope="col" (click)="ordenarPor('nombre')">Nombre</th>
                 <th scope="col" (click)="ordenarPor('username')">Username</th>
-                <th scope="col" (click)="ordenarPor('especialidad')">Especialidad</th>
+                <th scope="col" (click)="ordenarPor('specialtyName')">Especialidad</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let ex of listExpert">
+            <tr *ngFor="let ex of listExpert | filter:searchText">
                 <td>{{ ex.id }}</td>
                 <td>{{ ex.dni }}</td>
                 <td>{{ ex.nombre }}</td>
@@ -54,13 +69,28 @@
                     <label for="username" class="form-label">Username</label>
                     <input type="text" id="username" class="form-control" [(ngModel)]="experto.username" name="username" required>
                 </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label">Pasword</label>
-                    <input type="text" id="username" class="form-control" [(ngModel)]="experto.password" name="username" required>
+                <div class="mb-3" *ngIf="!isEditing">
+                    <label for="password" class="form-label">Pasword</label>
+                    <input type="text" id="password" class="form-control" [(ngModel)]="experto.password" name="password" required>
                 </div>
                 <div class="mb-3">
                     <label for="especialidad" class="form-label">Especialidad</label>
-                    <input type="text" id="especialidad" class="form-control" [(ngModel)]="experto.specialtyId" name="especialidad" required>
+                    <select
+                        id="especialidad"
+                        class="form-control"
+                        name="especialidad"
+                        required
+                        [ngStyle]="{ 'max-height': '200px', 'overflow-y': 'auto' }">
+                        <option ngValue="">{{ isEditing ? experto.specialtyName : 'Seleccione una especialidad' }}</option>
+                        <option *ngFor="let specialty of listSpecialty" [value]="specialty.id">
+                            
+                            {{ specialty.name }}
+                        </option>
+                    </select>
+                </div>
+                <!-- Mostrar mensaje de error dentro del modal -->
+                <div *ngIf="errorMessage" class="alert alert-danger">
+                    {{ errorMessage }}
                 </div>
                 <button type="submit" class="btn btn-success">{{ isEditing ? 'Guardar Cambios' : 'Agregar Experto' }}</button>
             </form>

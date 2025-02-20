@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../service/login.service';
-import { RedirectCommand, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,30 +12,30 @@ import { RedirectCommand, Router } from '@angular/router';
 })
 export class LoginComponent {
 
-  usuario : string;
-  clave : string;
+  usuario: string;
+  clave: string;
+  errorMessage: string | null = null; // Variable para manejar el mensaje de error
 
   constructor(private login: LoginService, private route: Router) {
     this.usuario = "";
     this.clave = "";
-
   }
 
-  logear():void{
-    
-    this.login.login(this.usuario, this.clave).subscribe((v)=>{  
-      // console.log(v);
-      if(v.funciona)
+  logear(): void {
+    this.errorMessage = null; // Limpiar el mensaje de error antes de intentar el login
 
-        this.route.navigate(["/"+v.perfil]);
-
-      else
-
-        alert("Error en la autenticacion")
-      
-    });
-
-    
+    this.login.login(this.usuario, this.clave).subscribe(
+      (v) => {
+        console.log(v);
+        if (v.token) {
+          this.route.navigate(["/" + v.roles[0].toLowerCase()]);
+        } else {
+          this.errorMessage = "Error en la autenticación"; // Mostrar mensaje de error
+        }
+      },
+      (error) => {
+        this.errorMessage = "Usuario o contraseña incorrectos"; // Mostrar mensaje de error en caso de fallo
+      }
+    );
   }
-
 }

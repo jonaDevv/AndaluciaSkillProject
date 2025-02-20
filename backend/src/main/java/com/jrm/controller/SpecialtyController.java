@@ -70,18 +70,37 @@ public class SpecialtyController {
         }
         
         Specialty specialty = genericDto.genericConvert(specialtyCreateDTO, Specialty.class);
-        Specialty savedSpecialty = specialtyService.save(specialty);
+
+        try{
+            Specialty savedSpecialty = specialtyService.save(specialty);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(genericDto.genericConvert(savedSpecialty, SpecialtyResponseDTO.class));
+
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(genericDto.genericConvert(savedSpecialty, SpecialtyResponseDTO.class));
     }
 
    
 
     @PutMapping("/{id}")
-    public ResponseEntity<SpecialtyResponseDTO> updateSpecialty(
+    public ResponseEntity<?> updateSpecialty(
             @PathVariable Long id,
             @Valid @RequestBody SpecialtyUpdateDTO specialtyUpdateDTO) {
+
+        Specialty s= specialtyService.findById(id).orElseThrow(() -> new SpecialtyNotFoundException(id));
+        
+        if(specialtyService.findByCod(specialtyUpdateDTO.getCod()).isPresent() && !specialtyUpdateDTO.getCod().equals(s.getCod())){
+            ApiError apiError = apiErrorService.getErrorMessage("El código de la especialidad " + specialtyUpdateDTO.getCod() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+
+        if(specialtyService.findByName(specialtyUpdateDTO.getName()).isPresent() && !specialtyUpdateDTO.getName().equals(s.getName())){
+            ApiError apiError = apiErrorService.getErrorMessage("El nombre de la especialidad " + specialtyUpdateDTO.getName() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+
 
         Specialty specialtyUpdate = genericDto.genericConvert(specialtyUpdateDTO, Specialty.class);
 

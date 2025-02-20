@@ -64,6 +64,7 @@ public class UserController {
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
         
 
+
         if (userService.findByDni(userDto.getDni()).isPresent()) {
             ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
@@ -80,16 +81,32 @@ public class UserController {
         user.setSpecialty(specialtyService.findById(userDto.getSpecialtyId())
                         .orElseThrow(() -> new SpecialtyNotFoundException(userDto.getSpecialtyId())));
 
-        User savedUser = userService.save(user);
+        try{
+            User savedUser = userService.save(user);
+            
+            UserResponseDTO responseDto = genericDto.genericConvert(savedUser, UserResponseDTO.class);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
         
-        UserResponseDTO responseDto = genericDto.genericConvert(savedUser, UserResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
         
+        User us = userService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        
+        if(userService.findByDni(userDTO.getDni()).isPresent() && !userDTO.getDni().equals(us.getDni())){
+            ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDTO.getDni() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
+
+        if(userService.findByUsername(userDTO.getUsername()).isPresent() && !userDTO.getUsername().equals(us.getUsername())){
+            ApiError apiError = apiErrorService.getErrorMessage("El usuario " + userDTO.getUsername() + " ya existe");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+        }
         
         return userService.findById(id)
         .map(user -> {

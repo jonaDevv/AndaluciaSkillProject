@@ -1,48 +1,52 @@
 <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-4">
-        <div class="card shadow-lg border-0 rounded-4">
-          <div class="card-body">
-            <h3 class="card-title text-center text-dark mb-4">Login</h3>
-            <form>
-              <div class="mb-3">
-                <label for="usuario" class="form-label text-muted">Usuario</label>
-                <input 
-                  type="text" 
-                  id="usuario" 
-                  class="form-control form-control-lg rounded-3" 
-                  [(ngModel)]="usuario" 
-                  name="usuario" 
-                  required
-                  placeholder="Ingrese su usuario"
-                />
-              </div>
-  
-              <div class="mb-4">
-                <label for="clave" class="form-label text-muted">Clave</label>
-                <input 
-                  type="password" 
-                  id="clave" 
-                  class="form-control form-control-lg rounded-3" 
-                  [(ngModel)]="clave" 
-                  name="clave" 
-                  required
-                  placeholder="Ingrese su clave"
-                />
-              </div>
-  
-              <div class="d-grid gap-2">
-                <button 
-                  type="button" 
-                  class="btn btn-dark btn-lg rounded-3" 
-                  (click)="logear()">
-                  Login
-                </button>
-              </div>
-            </form>
-          </div>
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body">
+          <h3 class="card-title text-center text-dark mb-4">Login</h3>
+          <form>
+            <div class="mb-3">
+              <label for="usuario" class="form-label text-muted">Usuario</label>
+              <input 
+                type="text" 
+                id="usuario" 
+                class="form-control form-control-lg rounded-3" 
+                [(ngModel)]="usuario" 
+                name="usuario" 
+                required
+                placeholder="Ingrese su usuario"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="clave" class="form-label text-muted">Clave</label>
+              <input 
+                type="password" 
+                id="clave" 
+                class="form-control form-control-lg rounded-3" 
+                [(ngModel)]="clave" 
+                name="clave" 
+                required
+                placeholder="Ingrese su clave"
+              />
+            </div>
+
+            <!-- Mostrar mensaje de error si existe -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="button" 
+                class="btn btn-dark btn-lg rounded-3" 
+                (click)="logear()">
+                Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
-  
+</div>

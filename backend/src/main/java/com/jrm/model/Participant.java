@@ -45,7 +45,7 @@ public class Participant {
 
 
     @ManyToOne
-    @JoinColumn(name = "specialty_id") 
+    @JoinColumn(name = "specialty_id", nullable=true) 
     private Specialty specialty;
 
 
