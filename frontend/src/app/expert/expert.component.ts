@@ -15,12 +15,12 @@ import { FilterPipe } from '../filter.service';
 })
 export class ExpertComponent implements OnInit {
   listExpert: any[] = [];
-  experto = { id: null, dni: '', nombre: '', username: '', password: '', specialtyName: '' };
+  experto = {  dni: '', nombre: '', username: '', password: '', specialtyId: '',specialtyName: '' };
   listSpecialty: any[] = [];
   searchText: string = '';
   errorMessage: string | null = null; // Variable para manejar el mensaje de error
   isEditing = false;  // Para saber si estamos editando un experto o agregando uno nuevo
-
+  
   constructor(private exper: ExpertService, private modalService: NgbModal, private spe: SpecialtyService) {}
 
   ngOnInit() {
@@ -47,7 +47,7 @@ export class ExpertComponent implements OnInit {
 
   // Abrir el modal para agregar un nuevo experto
   abrirFormulario(modalContent: TemplateRef<any>) {
-    this.experto = { id: null, dni: '', nombre: '', username: '',password: '', specialtyName: '' };  // Limpiar los campos
+    this.experto = {  dni: '', nombre: '', username: '',password: '', specialtyId: '',specialtyName: '' };  // Limpiar los campos
     this.isEditing = false;  // Se asume que es agregar un nuevo experto
     this.errorMessage = null; // Limpiar el mensaje de error al abrir el modal
     this.modalService.open(modalContent);  // Abrimos el modal con el contenido
@@ -81,8 +81,9 @@ export class ExpertComponent implements OnInit {
         }
       });
     } else {
+      console.log(this.experto)
       this.exper.addUser(this.experto).subscribe( {
-
+          
           next: (newExpert) => {
               
             if (newExpert) {

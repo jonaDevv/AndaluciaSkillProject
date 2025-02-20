@@ -73,7 +73,7 @@
                     <label for="password" class="form-label">Pasword</label>
                     <input type="text" id="password" class="form-control" [(ngModel)]="experto.password" name="password" required>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="especialidad" class="form-label">Especialidad</label>
                     <select
                         id="especialidad"
@@ -82,8 +82,26 @@
                         required
                         [ngStyle]="{ 'max-height': '200px', 'overflow-y': 'auto' }">
                         <option ngValue="">{{ isEditing ? experto.specialtyName : 'Seleccione una especialidad' }}</option>
-                        <option *ngFor="let specialty of listSpecialty" [value]="specialty.id">
+                        <option *ngFor="let specialty of listSpecialty" [ngValue]="specialty.id">
                             
+                            {{ specialty.name }}
+                        </option>
+                    </select>
+                </div> -->
+                <div class="mb-3">
+                    <label for="especialidad" class="form-label">Especialidad</label>
+                    <select
+                        id="especialidad"
+                        class="form-control"
+                        name="especialidad"
+                        required
+                        [(ngModel)]="experto.specialtyId" 
+                        [ngStyle]="{ 'max-height': '200px', 'overflow-y': 'auto' }">
+                        <!-- Opción predeterminada -->
+                        <option *ngIf="isEditing" [ngValue]="null"> {{ experto.specialtyName }} </option>
+                        <option *ngIf="!isEditing" [ngValue]="null">Seleccione una especialidad</option>
+                        <!-- Opciones dinámicas -->
+                        <option *ngFor="let specialty of listSpecialty" [ngValue]="specialty.id">
                             {{ specialty.name }}
                         </option>
                     </select>

@@ -42,14 +42,14 @@ export class ExpertService {
   // }
 
   getAll(): Observable<any[]> {
-    console.log(this.token)
+    
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.token}`
     });
     
     return this.http.get<any[]>('http://localhost:8080/users', { headers }).pipe(
       map((usuarios: any[]) => {
-        console.log(usuarios);
+       
         return usuarios.filter(usuario => usuario.roles == 'EXPERT');
       }),
       catchError(error => {

@@ -26,7 +26,7 @@ export class LoginComponent {
 
     this.login.login(this.usuario, this.clave).subscribe(
       (v) => {
-        console.log(v);
+        
         if (v.token) {
           this.route.navigate(["/" + v.roles[0].toLowerCase()]);
         } else {
