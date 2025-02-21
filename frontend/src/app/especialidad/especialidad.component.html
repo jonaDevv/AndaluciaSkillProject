@@ -40,8 +40,9 @@
                 <td>{{ es.name }}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" (click)="editarEspecialidad(es, modalContent)">Editar</button>
-                    <button class="btn btn-danger btn-sm" (click)="delete(es.id)">Eliminar</button>
+                    <button class="btn btn-danger btn-sm" (click)="confirmDelete(es.id, confirmDeleteModal)">Eliminar</button>
                 </td>
+                
             </tr>
         </tbody>
     </table>
@@ -71,4 +72,18 @@
             </form>
         </div>
     </ng-template>
+     <!-- Modal template modificado -->
+<ng-template #confirmDeleteModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        ¿Está seguro de que desea eliminar esta especialidad?
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="delete(selectedEspecialidadId); modal.close()">Eliminar</button>
+    </div>
+</ng-template>
 </div>

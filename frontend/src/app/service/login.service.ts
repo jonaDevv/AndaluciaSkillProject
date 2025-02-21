@@ -183,13 +183,15 @@ export class LoginService {
   private authState = new BehaviorSubject<{ logeado: boolean, perfil: string, nombre: string }>({
     logeado: false,
     perfil: '',
-    nombre: ''
+    nombre: '',
+    
   });
 
   token: string = '';
   perfil: string = '';
   logeado: boolean = false;
   usuario: any = {};
+  especialidad: string = '';
 
   constructor(private http: HttpClient) {
     this.recuperar(); // Recuperar el estado del login al inicializar el servicio
@@ -200,7 +202,8 @@ export class LoginService {
       token: this.token,
       perfil: this.perfil,
       logeado: this.logeado,
-      usuario: this.usuario
+      usuario: this.usuario,
+      especialidad: this.especialidad
     };
     sessionStorage.setItem("LOGIN", JSON.stringify(objeto));
     this.authState.next({ logeado: this.logeado, perfil: this.perfil, nombre: this.usuario.nombre });
@@ -213,6 +216,7 @@ export class LoginService {
       this.token = objeto.token;
       this.perfil = objeto.perfil;
       this.logeado = objeto.logeado;
+      this.especialidad = objeto.especialidad;
       this.usuario = objeto.usuario;
       this.authState.next({ logeado: this.logeado, perfil: this.perfil, nombre: this.usuario.nombre });
     }
@@ -224,9 +228,11 @@ export class LoginService {
       password: pass
     }).pipe(
       map((data: any) => {
+        console.log(data.specialtyName)
         if (data && data.token) {
           this.usuario = { nombre: data.username };
           this.perfil = data.roles[0].toLowerCase();
+          this.especialidad = data.specialtyName;
           this.token = data.token;
           this.logeado = true;
           this.almacenar();
@@ -262,6 +268,13 @@ export class LoginService {
   }
 
   getToken(): string {
+
+
     return this.token || '';
+  }
+
+  getEspecialidad(): string {
+
+    return this.especialidad || '';
   }
 }

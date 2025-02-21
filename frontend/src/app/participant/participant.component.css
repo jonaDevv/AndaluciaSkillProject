@@ -1,0 +1,22 @@
+.modal-dialog {
+    margin-top: 600px !important;
+    position: absolute;
+    width: 500px;
+    height: 300px;
+    top: 50%;
+}
+
+.modal-content{
+    margin-top: 600px !important;
+    width: 500px;
+    height: 300px;
+}
+.modal-open{
+
+    margin-top: 600px !important;
+    position: absolute;
+    width: 500px;
+    height: 300px;
+    top: 50%;
+    padding-top: 600px !important;
+}

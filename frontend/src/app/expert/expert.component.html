@@ -42,14 +42,14 @@
                 <td>{{ ex.specialtyName }}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" (click)="editarExperto(ex, modalContent)">Editar</button>
-                    <button class="btn btn-danger btn-sm" (click)="delete(ex.id)">Eliminar</button>
+                    <button class="btn btn-danger btn-sm" (click)="confirmDelete(ex.id, confirmDeleteModal)">Eliminar</button>
                 </td>
             </tr>
         </tbody>
     </table>
 
     <!-- Modal Template -->
-    <ng-template #modalContent let-modal>
+    <ng-template #modalContent let-modal >
         <div class="modal-header bg-dark"></div>
         <div class="modal-header">
             <h5 class="modal-title" id="modalFormularioLabel">{{ isEditing ? 'Editar Experto' : 'Agregar Experto' }}</h5>
@@ -98,7 +98,7 @@
                         [(ngModel)]="experto.specialtyId" 
                         [ngStyle]="{ 'max-height': '200px', 'overflow-y': 'auto' }">
                         <!-- Opción predeterminada -->
-                        <option *ngIf="isEditing" [ngValue]="null"> {{ experto.specialtyName }} </option>
+                        <option *ngIf="isEditing" [ngValue]="experto.specialtyId" > {{ experto.specialtyName }} </option>
                         <option *ngIf="!isEditing" [ngValue]="null">Seleccione una especialidad</option>
                         <!-- Opciones dinámicas -->
                         <option *ngFor="let specialty of listSpecialty" [ngValue]="specialty.id">
@@ -114,4 +114,19 @@
             </form>
         </div>
     </ng-template>
+  <!-- Modal template modificado -->
+<ng-template #confirmDeleteModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        ¿Está seguro de que desea eliminar este experto?
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="delete(selectedExpertId); modal.close()">Eliminar</button>
+    </div>
+</ng-template>
+
 </div>

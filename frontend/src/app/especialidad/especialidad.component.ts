@@ -18,6 +18,7 @@ export class EspecialidadComponent implements OnInit {
   isEdit = false;  // Para saber si estamos editando una especialidad o agregando una nueva
   searchText: string = '';
   errorMessage: string | null = null; // Variable para manejar el mensaje de error
+  selectedEspecialidadId:any;
 
   constructor(private spe: SpecialtyService, private modalService: NgbModal) {}
 
@@ -123,5 +124,10 @@ guardarEspecialidad() {
 
   cerrarModal(modal: NgbModal) {
     this.modalService.dismissAll();
+  }
+
+    confirmDelete(id: any, modalContent: TemplateRef<any>) {
+      this.selectedEspecialidadId = id;
+      this.modalService.open(modalContent);
   }
 }
