@@ -15,41 +15,43 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PruebaService  implements BaseService<Prueba, Long> {
+public class PruebaService implements BaseService<Prueba, Long> {
 
     private final PruebaRepository pruebaRepository;
     private final SpecialtyService specialtyService;
+    private final FileStorageService fileStorageService; // Servicio para almacenar archivos
 
     @Override
     public List<Prueba> findAll() {
-        
         return pruebaRepository.findAll();
     }
 
     @Override
     public Optional<Prueba> findById(Long id) {
-        
         return pruebaRepository.findById(id);
     }
 
     @Override
-    public Prueba save(Prueba test) {
-        
-        return pruebaRepository.save(test);
+    public Prueba save(Prueba prueba) {
+        // Si la prueba tiene un archivo PDF pendiente de almacenar, se procesa aquí.
+        if (prueba.getPdfFile() != null) {
+            String pdfUrl = fileStorageService.storeFile(prueba.getPdfFile());
+            prueba.setPdfUrl(pdfUrl);
+            // Quizás luego limpiar el campo pdfFile si no se persiste en la entidad
+            prueba.setPdfFile(null);
+        }
+        return pruebaRepository.save(prueba);
     }
 
     @Override
-    public Prueba update(Long id, Prueba t) {
-        
-        return pruebaRepository.save(t); 
+    public Prueba update(Long id, Prueba prueba) {
+        return pruebaRepository.save(prueba); 
     }
 
     @Override
     public void delete(Long id) {
-        
-        Prueba test = pruebaRepository.findById(id)
+        Prueba prueba = pruebaRepository.findById(id)
                                     .orElseThrow(() -> new PruebaNotFoundException(id));
-        pruebaRepository.delete(test);
+        pruebaRepository.delete(prueba);
     }
-
 }

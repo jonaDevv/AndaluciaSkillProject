@@ -1,77 +1,50 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginService } from './login.service';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PruebaService {
-  
-  token : any;
-  header : any;
-  constructor(private http: HttpClient, private loginser : LoginService) {
+  private readonly API_URL = 'http://localhost:8080/prueba';
 
-     this.token = loginser.getToken();
+  constructor(
+    private http: HttpClient,
+    private loginService: LoginService
+  ) {}
 
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Authorization': `Bearer ${this.loginService.getToken()}`
+    });
   }
 
-  getAll(): Observable<any[]> {
-        console.log(this.token)
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${this.token}`
-        });
-        
-        return this.http.get<any[]>('http://localhost:8080/prueba', { headers });
-        
-      }
+  getAll(especialidad?: string): Observable<any[]> {
+    const params: any = {};
+    if (especialidad) params.especialidad = especialidad;
     
-      addPrueba(prueba: any): Observable<any> {
-        // Configurar el encabezado con el token de autorización
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${this.token}`
-        });
-      
-        // Hacer la solicitud POST al servidor con los datos del nuevo experto
-        return this.http.post<any>('http://localhost:8080/prueba', prueba, { headers }).pipe(
-          map((newPrueba) => {
-            console.log('Nueva prueba agregada:', newPrueba);
-            return newPrueba;  // Devuelve el experto recién creado
-          })
-        );
-      }
-      
-    
-      updatePrueba(prueba: any): Observable<any> {
-        // Configurar el encabezado con el token de autorización
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${this.token}`
-        });
-      
-        // Hacer la solicitud PUT al servidor con los datos del experto
-        return this.http.put<any>(`http://localhost:8080/prueba/${prueba.id}`, prueba, { headers }).pipe(
-          map((updatedPrueba) => {
-            console.log('Prueba actualizada:', updatedPrueba);
-            return updatedPrueba;
-          })
-        );
-      }
-    
-      
-  
-      deletePrueba(id: string): Observable<any> {
-        const headers = new HttpHeaders({
-          'Authorization': `Bearer ${this.token}`
-        });
-      
-        return this.http.delete('http://localhost:8080/prueba/' + id, { headers });
-      }
-  
-  
-  
-    
-  
-  
-  
-  
+    return this.http.get<any[]>(this.API_URL, {
+      headers: this.getHeaders(),
+      params
+    });
+  }
+
+  addPrueba(formData: FormData): Observable<any> {
+    return this.http.post(this.API_URL, formData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  updatePrueba(id: string, formData: FormData): Observable<any> {
+    return this.http.put(`${this.API_URL}/${id}`, formData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  deletePrueba(id: string): Observable<any> {
+    return this.http.delete(`${this.API_URL}/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
 }

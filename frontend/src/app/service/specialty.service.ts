@@ -1,77 +1,69 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginService } from './login.service';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpecialtyService {
   
-  
-  token : any;
-  header : any;
-  constructor(private http: HttpClient, private loginser : LoginService) {
+  // URL base del backend
+  private apiUrl = 'http://localhost:8080/specialty';
 
-     this.token = loginser.getToken();
+  constructor(private http: HttpClient, private loginser: LoginService) {}
 
+  // Obtener el token actualizado y construir los headers
+  private getHeaders(): HttpHeaders {
+    const token = this.loginser.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
+  // Manejo de errores
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('Ocurrió un error:', error);
+    return throwError(() => error);
+  }
 
+  // Obtener todas las especialidades
   getAll(): Observable<any[]> {
-      console.log(this.token)
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.token}`
-      });
-      
-      return this.http.get<any[]>('http://localhost:8080/specialty', { headers });
-      
-    }
-  
-    addSpecialty(specialty: any): Observable<any> {
-      // Configurar el encabezado con el token de autorización
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.token}`
-      });
-    
-      // Hacer la solicitud POST al servidor con los datos del nuevo experto
-      return this.http.post<any>('http://localhost:8080/specialty', specialty, { headers }).pipe(
+    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  // Agregar una nueva especialidad
+  addSpecialty(specialty: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, specialty, { headers: this.getHeaders() })
+      .pipe(
         map((newSpecialty) => {
           console.log('Nueva especialidad agregada:', newSpecialty);
-          return newSpecialty;  // Devuelve el experto recién creado
-        })
+          return newSpecialty;
+        }),
+        catchError(this.handleError)
       );
-    }
-    
-  
-    updateSpecialty(specialty: any): Observable<any> {
-      // Configurar el encabezado con el token de autorización
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.token}`
-      });
-    
-      // Hacer la solicitud PUT al servidor con los datos del experto
-      return this.http.put<any>(`http://localhost:8080/specialty/${specialty.id}`, specialty, { headers }).pipe(
+  }
+
+  // Actualizar una especialidad
+  updateSpecialty(specialty: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${specialty.id}`, specialty, { headers: this.getHeaders() })
+      .pipe(
         map((updatedSpecialty) => {
-          console.log('especialidad actualizado:', updatedSpecialty);
+          console.log('Especialidad actualizada:', updatedSpecialty);
           return updatedSpecialty;
-        })
+        }),
+        catchError(this.handleError)
       );
-    }
-  
-    
+  }
 
-    deleteSpecialty(id: string): Observable<any> {
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${this.token}`
-      });
-    
-      return this.http.delete('http://localhost:8080/specialty/' + id, { headers });
-    }
-
-
-
-  
-
-
+  // Eliminar una especialidad
+  deleteSpecialty(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }

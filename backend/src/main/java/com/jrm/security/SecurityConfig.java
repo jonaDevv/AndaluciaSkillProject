@@ -98,6 +98,8 @@ public class SecurityConfig {
                 .requestMatchers("swagger-ui/**").permitAll()
                 .requestMatchers("swagger-resources/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
+                
+                .requestMatchers("uploads/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/participant","/prueba","/evaluacion","/evaluacionitem","/item").hasAuthority("ROLE_EXPERT")
                 .requestMatchers(HttpMethod.GET, "/specialty","/participant","/prueba","/evaluacion","/evaluacionitem","/item").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/participant/**","/prueba/**","/evaluacion/**","/evaluacion","/evaluacionitem/**","/item/**").hasAuthority("ROLE_EXPERT")

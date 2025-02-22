@@ -20,19 +20,16 @@ import lombok.NoArgsConstructor;
 public class ItemUpdateDto {
 
     
-    private Long id;
-
-   
+    @NotNull(message = "La descripción no puede ser nula")
     private String description;
 
-    
-    @Positive(message = "El valor debe ser positivo")
+    @DecimalMin(value = "0.0", message = "El peso no puede ser negativo")
     private int weight;
 
-    @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
+    @DecimalMin(value = "0.0", message = "La valoración no puede ser negativa")
     private float percentage;
 
- 
+    @NotNull(message = "El test al que pertenece no puede ser nulo")
     private Long prueba;
 
 }

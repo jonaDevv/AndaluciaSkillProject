@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMin;
 
 import jakarta.validation.constraints.NotNull;
@@ -54,6 +57,12 @@ public class Prueba {
     @JoinColumn(name = "specialty_id", nullable = true)
     private Specialty specialty;
 
+    // Campo para la URL o ruta del PDF que se persistirá
+    private String pdfUrl;
+    
+    // Campo para capturar el archivo PDF; no se persistirá
+    @Transient
+    private org.springframework.web.multipart.MultipartFile pdfFile;
 
     // Relación 1:N con Item
     @OneToMany(
@@ -61,6 +70,7 @@ public class Prueba {
         cascade = CascadeType.ALL, // Propaga operaciones (save, delete) a los Items
         orphanRemoval = true // Elimina Items huérfanos (sin referencia a Test)
     )
+    @JsonManagedReference
     private List<Item> items = new ArrayList<>();
 
 

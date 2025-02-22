@@ -8,6 +8,7 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
+import com.jrm.dto.item.ItemResponseDto;
 import com.jrm.model.Specialty;
 
 import jakarta.persistence.CascadeType;
@@ -41,10 +42,10 @@ public class PruebaResponseDto {
 
     private float maxScore;
 
-
+    private String pdfUrl;
 
     private String specialtyName;
 
-    private List<Item> items = new ArrayList<>();
+    private List<ItemResponseDto> items = new ArrayList<>();
 
 }

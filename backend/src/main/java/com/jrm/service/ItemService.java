@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jrm.dto.item.ItemCreateDto;
 import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.model.Item;
 import com.jrm.repository.ItemRepository;
@@ -37,6 +40,11 @@ public class ItemService implements BaseService<Item, Long> {
         return itemRepository.save(item);
     }
 
+    public List<Item> saveAll(List<Item> items) {
+        
+        return itemRepository.saveAll(items);
+    }
+
     @Override
     public Item update(Long id, Item t) {
         
@@ -50,6 +58,15 @@ public class ItemService implements BaseService<Item, Long> {
                                     .orElseThrow(() -> new ItemNotFoundException(id));
         itemRepository.delete(item);
     }
+
+     public List<ItemCreateDto> parseItemsJson(String itemsJson) {
+        try {
+            return new ObjectMapper().readValue(itemsJson, new TypeReference<>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Error al parsear items: " + e.getMessage());
+        }
+    }
+
     
 
 }

@@ -10,12 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MyConfiguration {
 
-    @Bean
+	@Bean
     public ModelMapper modelMapper() {
-        
-        return new ModelMapper();
- 
-    }
+        ModelMapper modelMapper = new ModelMapper();
+
+        return modelMapper;
+	}
 
 	
 

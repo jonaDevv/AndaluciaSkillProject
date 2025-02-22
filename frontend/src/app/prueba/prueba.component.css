@@ -1,0 +1,92 @@
+.pdf-viewer-modal .modal-content {
+    height: 90vh;
+  }
+  
+  .pdf-viewer-modal iframe {
+    height: calc(90vh - 60px);
+    width: 100%;
+  }
+
+  /* En prueba.component.css */
+.modal-content {
+    max-height: 90vh; /* Altura máxima del modal */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-body {
+    overflow: hidden; /* Contiene el contenido interno */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .items-container {
+    flex: 1;
+    min-height: 250px; /* Altura mínima */
+    max-height: 50vh; /* Altura máxima relativa */
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+/* Personalización del scrollbar */
+.items-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.items-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.items-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.items-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.item-card {
+    margin: auto;
+    width: 24em;
+    text-align: center;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.item-card:hover {
+    transform: translateX(3px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Asegura que los cambios se reflejen visualmente */
+.form-control-plaintext {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .text-primary {
+    color: #0d6efd !important;
+  }
+
+  /* Añadir transición suave para los cambios */
+.item-card {
+    transition: all 0.3s ease;
+  }
+  
+  /* Mejorar visibilidad del borde de error */
+  .is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220,53,69,.25);
+  }
+  
+  /* Ajustar tamaño máximo del modal */
+  .modal-lg {
+    max-width: 800px;
+  }
+
+  
