@@ -39,9 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class EvaluacionController {
 
     private final EvaluacionService evaluacionService;
-    private final UserService userService;
-    private final ParticipantService participantService;
-    private final PruebaService pruebaService;
     private final ConverterDto converter;
 
 

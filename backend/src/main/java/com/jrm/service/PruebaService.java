@@ -3,6 +3,7 @@ package com.jrm.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.jrm.error.prueba.PruebaNotFoundException;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 public class PruebaService implements BaseService<Prueba, Long> {
 
     private final PruebaRepository pruebaRepository;
-    private final SpecialtyService specialtyService;
     private final FileStorageService fileStorageService; // Servicio para almacenar archivos
 
     @Override

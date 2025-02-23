@@ -19,9 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class EvaluacionService implements BaseService<Evaluacion, Long> {
     
     private final EvaluacionRepository evaR;
-    private final UserService userS;
-    private final ParticipantService partS;
-    private final PruebaService pruebaS;
+   
   
     @Override
     public List<Evaluacion> findAll() {
