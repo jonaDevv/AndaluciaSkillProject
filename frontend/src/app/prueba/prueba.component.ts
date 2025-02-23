@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild, AfterViewInit } from '@angular/core'; // Importa AfterViewInit
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -8,11 +8,8 @@ import { FilterPipe } from '../filter.service';
 import { PruebaService } from '../service/prueba.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ChangeDetectorRef } from '@angular/core';
-// import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
-// import { getDocument } from 'pdfjs-dist/build/pdf.mjs';
 import * as pdfjsLib from 'pdfjs-dist';
 import { getDocument } from 'pdfjs-dist';
-
 
 @Component({
   selector: 'app-prueba',
@@ -21,16 +18,16 @@ import { getDocument } from 'pdfjs-dist';
   templateUrl: './prueba.component.html',
   styleUrls: ['./prueba.component.css']
 })
-export class PruebaComponent implements OnInit {
+export class PruebaComponent implements OnInit, AfterViewInit { // Implementa AfterViewInit
   listPrueba: any[] = [];
   showPercentageError = false;
-  prueba = { 
-    id: '', 
-    enunciado: '', 
-    specialty: '', 
-    specialtyName: '', 
-    items: [] as any[], 
-    pdfFile: null as File | null 
+  prueba = {
+    id: '',
+    enunciado: '',
+    specialty: '',
+    specialtyName: '',
+    items: [] as any[],
+    pdfFile: null as File | null
   };
   @ViewChild('pdfModal') pdfModal!: TemplateRef<any>;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
@@ -49,26 +46,22 @@ export class PruebaComponent implements OnInit {
   private pdfDoc: any = null;
   currentScale: number = 1.0;
   zoomStep: number = 0.25;
+  private currentPage: number = 1;
 
+  currentPdfUrl!: string;
+  reloadPdf = true;
 
-   currentPdfUrl!: string;
-   reloadPdf = true;
-   
+  // Variables para arrastrar el PDF
+  private isDragging = false;
+  private offsetX = 0;
+  private offsetY = 0;
+  private startX = 0;
+  private startY = 0;
 
- 
-    // Variables para arrastrar el PDF
-    private isDragging = false;
-    private offsetX = 0;
-    private offsetY = 0;
-    private startX = 0;
-    private startY = 0;
-    
-    private boundMouseDown = (event: MouseEvent) => this.onMouseDown(event);
-    private boundMouseMove = (event: MouseEvent) => this.onMouseMove(event);
-    private boundMouseUp = () => this.onMouseUp();
-  
-  
- 
+  private boundMouseDown = (event: MouseEvent) => this.onMouseDown(event);
+  private boundMouseMove = (event: MouseEvent) => this.onMouseMove(event);
+  private boundMouseUp = () => this.onMouseUp();
+
 
   // Usamos una variable para almacenar la puntuación máxima
   maxScoreCalculada: number = 0;
@@ -79,13 +72,32 @@ export class PruebaComponent implements OnInit {
     private modalService: NgbModal,
     private spe: SpecialtyService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.min.mjs';
     this.loadPruebas();
     this.loadSpecialties();
   }
+
+  ngAfterViewInit(): void {
+    // Añade los listeners de eventos al canvas una vez que la vista se ha inicializado
+    if (this.pdfCanvas) {
+        this.pdfCanvas.nativeElement.addEventListener('mousedown', this.boundMouseDown);
+        document.addEventListener('mousemove', this.boundMouseMove);
+        document.addEventListener('mouseup', this.boundMouseUp);
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Elimina los listeners de eventos cuando el componente se destruye para evitar fugas de memoria
+    if (this.pdfCanvas) {
+        this.pdfCanvas.nativeElement.removeEventListener('mousedown', this.boundMouseDown);
+        document.removeEventListener('mousemove', this.boundMouseMove);
+        document.removeEventListener('mouseup', this.boundMouseUp);
+    }
+  }
+
 
   private loadPruebas() {
     this.pru.getAll(this.userEspecialidad).subscribe({
@@ -102,20 +114,20 @@ export class PruebaComponent implements OnInit {
   }
 
   ordenarPor(campo: string) {
-    this.listPrueba = [...this.listPrueba].sort((a, b) => 
+    this.listPrueba = [...this.listPrueba].sort((a, b) =>
       a[campo] > b[campo] ? 1 : a[campo] < b[campo] ? -1 : 0
     );
   }
 
   abrirFormulario(modalContent: TemplateRef<any>) {
     // Reiniciamos la prueba y la puntuación máxima
-    this.prueba = { 
-      id: '', 
-      enunciado: '', 
-      specialty: '', 
-      specialtyName: '', 
-      items: [], 
-      pdfFile: null 
+    this.prueba = {
+      id: '',
+      enunciado: '',
+      specialty: '',
+      specialtyName: '',
+      items: [],
+      pdfFile: null
     };
     this.maxScoreCalculada = 0;
     this.showPercentageError = false;
@@ -124,43 +136,41 @@ export class PruebaComponent implements OnInit {
     this.modalService.open(modalContent, { centered: true });
   }
 
-  
 
- 
   // Modifica el método verPDF para resetear la paginación
   async verPDF(pdfUrl: string) {
-    
+
     if (!pdfUrl) {
       this.errorMessage = 'No hay PDF disponible para visualizar';
       return;
     }
-    this.currentScale = 1.0;
+    this.currentScale = 1.0; // Resetear la escala a 1.0 al abrir un nuevo PDF
     this.offsetX = 0;
     this.offsetY = 0;
-  
+
     try {
       this.isLoaded = false;
       this.fullPdfUrl = `http://localhost:8080/files/${encodeURIComponent(pdfUrl)}`;
-      
-      const modalRef = this.modalService.open(this.pdfModal, { 
+
+      const modalRef = this.modalService.open(this.pdfModal, {
         size: 'xl',
         modalDialogClass: 'pdf-viewer-modal'
       });
-  
+
       // Esperar a que el modal se renderice completamente
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const loadingTask = getDocument({
         url: this.fullPdfUrl,
         disableAutoFetch: true
       });
-      
+
       this.pdfDoc = await loadingTask.promise;
       this.totalPages = this.pdfDoc.numPages;
       this.page = 1;
-      
-      await this.renderPage(this.page);
-  
+
+      await this.renderPage(this.page, true); // Pasa 'true' para indicar renderización inicial
+
     } catch (error) {
       this.handlePdfError();
     } finally {
@@ -169,8 +179,7 @@ export class PruebaComponent implements OnInit {
     }
   }
 
-  
- 
+
 
   // Modificar el método downloadPdf
   async downloadPdf() {
@@ -179,66 +188,77 @@ export class PruebaComponent implements OnInit {
       if (!this.fullPdfUrl) {
         throw new Error('La URL del PDF no está definida.');
       }
-  
+
       const response = await fetch(this.fullPdfUrl);
       if (!response.ok) throw new Error('Error en la descarga');
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
-  
+
       // Verificar que this.fullPdfUrl tiene un valor antes de usar split
       const fileName = this.fullPdfUrl.split('/').pop() || 'documento.pdf';
       link.download = fileName;
-  
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
     } catch (error) {
       console.error('Error descargando PDF:', error);
       this.errorMessage = 'Error al descargar el PDF';
     }
   }
 
-  private async renderPage(pageNumber: number) {
+  private async renderPage(pageNumber: number, initialRender = false) { // Añade initialRender flag
     if (!this.pdfDoc) return;
     try {
       const page = await this.pdfDoc.getPage(pageNumber);
       const canvas = document.getElementById('pdfCanvas') as HTMLCanvasElement;
       const context = canvas.getContext('2d')!;
-      
+
+      // Obtener el contenedor del PDF
+      const container = document.querySelector('.pdf-container') as HTMLElement;
+
+      let scaleToUse = this.currentScale; // Usa la escala actual por defecto
+
+      if (initialRender) {
+        // Calcular escala inicial solo en la primera renderización
+        scaleToUse = container.clientWidth / page.getViewport({ scale: 1 }).width;
+        this.currentScale = scaleToUse; // Actualiza currentScale con la escala inicial
+      }
+
+
       // Obtener dimensiones del viewport escalado
-      const scaledViewport = page.getViewport({ scale: this.currentScale });
-      
+      const scaledViewport = page.getViewport({ scale: scaleToUse });
+
       // Ajustar tamaño del canvas
       canvas.width = scaledViewport.width;
       canvas.height = scaledViewport.height;
-      
+
       // Limpiar canvas
       context.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       // Renderizar la página con el nuevo zoom
       await page.render({
         canvasContext: context,
         viewport: scaledViewport
       }).promise;
-      
+
     } catch (error) {
       console.error('Error renderizando página:', error);
       this.handlePdfError();
     }
   }
-  
-  
+
   private updateCanvasPosition() {
     const canvas = document.getElementById('pdfCanvas') as HTMLCanvasElement;
     canvas.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px)`;
   }
-  
+
 
   onMouseDown(event: MouseEvent) {
     event.stopPropagation();
@@ -246,20 +266,20 @@ export class PruebaComponent implements OnInit {
     this.startX = event.clientX - this.offsetX;
     this.startY = event.clientY - this.offsetY;
   }
-  
+
   onMouseMove(event: MouseEvent) {
     event.stopPropagation();
     if (!this.isDragging) return;
-    
+
     // Actualizar la posición del desplazamiento
     this.offsetX = event.clientX - this.startX;
     this.offsetY = event.clientY - this.startY;
-    
+
     // Redibujar el canvas con el nuevo desplazamiento
     const canvas = this.pdfCanvas.nativeElement;
     canvas.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px)`;
   }
-  
+
   onMouseUp(event?: MouseEvent) {
     if (event) {
       event.stopPropagation();
@@ -270,12 +290,12 @@ export class PruebaComponent implements OnInit {
   }
 
   zoomIn() {
-    this.currentScale = Math.min(3.0, this.currentScale + this.zoomStep);
+    this.currentScale = Math.min(this.currentScale + this.zoomStep, 3); // Zoom máximo x3
     this.renderPage(this.page);
   }
-  
+
   zoomOut() {
-    this.currentScale = Math.max(0.5, this.currentScale - this.zoomStep);
+    this.currentScale = Math.max(this.currentScale - this.zoomStep, 0.5); // Zoom mínimo x0.5
     this.renderPage(this.page);
   }
 
@@ -309,7 +329,7 @@ export class PruebaComponent implements OnInit {
     this.reloadPdf = false; // Desactiva temporalmente el objeto
     const urlWithPage = `${this.fullPdfUrl}#page=${page}`;
     this.currentPdfUrl = urlWithPage;
-    
+
     // Forzar actualización del objeto PDF
     setTimeout(() => {
       this.reloadPdf = true;
@@ -319,7 +339,6 @@ export class PruebaComponent implements OnInit {
   }
 
 
-  
 
 
   agregarItem() {
@@ -345,7 +364,7 @@ export class PruebaComponent implements OnInit {
       this.errorMessage = 'Por favor seleccione un archivo PDF válido';
     }
   }
-  
+
   // Calcula la puntuación máxima basado en los pesos de los items
   onItemChange() {
     setTimeout(() => {
@@ -367,8 +386,8 @@ export class PruebaComponent implements OnInit {
     formData.append('maxScore', this.maxScoreCalculada.toString());
     formData.append('specialty', this.prueba.specialty);
     // formData.append('items', JSON.stringify(this.prueba.items));
-    
-     // Asegurarse de no enviar pruebaId en los items
+
+    // Asegurarse de no enviar pruebaId en los items
     const sanitizedItems = this.prueba.items.map(item => {
       const { pruebaId, ...sanitizedItem } = item; // Eliminar pruebaId si está presente
       return sanitizedItem;
@@ -378,14 +397,14 @@ export class PruebaComponent implements OnInit {
     if (this.prueba.pdfFile) {
       formData.append('pdfFile', this.prueba.pdfFile);
     }
-    
+
     return formData;
   }
 
   guardarPrueba() {
     this.errorMessage = null;
-   
-  
+
+
     if (this.porcentajeTotal !== 100) {
       this.showPercentageError = true;
       this.errorMessage = `La suma de porcentajes debe ser 100% (Actual: ${this.porcentajeTotal}%)`;
@@ -393,7 +412,7 @@ export class PruebaComponent implements OnInit {
     }
     const formData = this.createFormData();
 
-    const serviceCall = this.isEditing 
+    const serviceCall = this.isEditing
       ? this.pru.updatePrueba(this.prueba.id, formData)
       : this.pru.addPrueba(formData);
 
@@ -420,7 +439,7 @@ export class PruebaComponent implements OnInit {
   }
 
   editarPrueba(prue: any, modalContent: TemplateRef<any>) {
-    this.prueba = { 
+    this.prueba = {
       ...prue,
       pdfFile: null,
       items: [...prue.items]
