@@ -28,10 +28,13 @@
       
         <!-- Para el perfil EXPERT -->
         <li class="nav-item" *ngIf="isLogged && perfil == 'expert'">
-          <a class="nav-link text-light" [routerLink]="['/expert/participantes']">Competidores</a>
+          <a class="nav-link text-light" [routerLink]="['/expert/participantes']">Participantes</a>
         </li>
         <li class="nav-item" *ngIf="isLogged && perfil == 'expert'">
           <a class="nav-link text-light" [routerLink]="['/expert/pruebas']">Pruebas</a>
+        </li>
+        <li class="nav-item" *ngIf="isLogged && perfil == 'expert'">
+          <a class="nav-link text-light" [routerLink]="['/expert/evaluaciones']">Evaluaciones</a>
         </li>
       </ul>
 

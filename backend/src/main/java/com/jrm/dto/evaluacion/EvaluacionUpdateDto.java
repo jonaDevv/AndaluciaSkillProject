@@ -17,7 +17,10 @@ public class EvaluacionUpdateDto {
 
 
     @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
-    private String pFinalObtenida;
+    private float pFinalObtenida;
+
+    @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
+    private float porcentajeFinalObtenido;
 
     
     // private User user;

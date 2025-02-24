@@ -55,10 +55,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
+import com.jrm.dto.evaluacion.EvaluacionResponseDto;
 import com.jrm.dto.item.ItemResponseDto;
 import com.jrm.dto.participant.ParticipantResponseDto;
 import com.jrm.dto.prueba.PruebaResponseDto;
 import com.jrm.dto.user.UserResponseDTO;
+import com.jrm.model.Evaluacion;
 import com.jrm.model.Item;
 import com.jrm.model.Participant;
 import com.jrm.model.Prueba;
@@ -83,6 +85,13 @@ public class ConverterDto {
             modelMapper.createTypeMap(User.class, UserResponseDTO.class)
             .addMappings(mapper -> {
                 mapper.map(src -> src.getSpecialty().getName(), UserResponseDTO::setSpecialtyName);
+            });
+
+            modelMapper.createTypeMap(Evaluacion.class, EvaluacionResponseDto.class)
+            .addMappings(mapper -> {
+                mapper.map(src -> src.getUser().getId(), EvaluacionResponseDto::setUser);
+                mapper.map(src -> src.getParticipant().getId(), EvaluacionResponseDto::setParticipant);
+                mapper.map(src -> src.getPrueba().getId(), EvaluacionResponseDto::setPrueba);
             });
     }
 

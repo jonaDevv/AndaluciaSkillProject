@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jrm.dto.converter.ConverterDto;
+import com.jrm.dto.evaluacion.EvaluacionDetailsDTO;
 import com.jrm.dto.evaluacion.EvaluacionResponseDto;
 import com.jrm.dto.evaluacionItem.EvaluacionItemCreateDto;
+import com.jrm.dto.evaluacionItem.EvaluacionItemDTO;
 import com.jrm.dto.evaluacionItem.EvaluacionItemResponseDto;
 import com.jrm.dto.evaluacionItem.EvaluacionItemUpdateDto;
 import com.jrm.error.evaluacion.EvaluacionNotFoundException;
@@ -110,6 +112,20 @@ public class EvaluacionItemController {
                 .orElseThrow(() -> new EvaluacionItemNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
     }
 
+    public EvaluacionItem updateEvaluacionItem(Long itemId, EvaluacionItemDTO dto) {
+        EvaluacionItem item = evItemService.findById(itemId)
+            .orElseThrow(() -> new RuntimeException("Ítem de evaluación no encontrado"));
+        
+        item.setValoracion(dto.getValoracion());
+        item.setJustificacion(dto.getJustificacion());
+        
+        return evItemService.save(item);
+    }
+
+    public EvaluacionDetailsDTO getEvaluacionDetails(Long id) {
+    Evaluacion evaluacion = evService.findByIdWithItems(id);
+    return evService.mapToDetailsDTO(evaluacion);
+    }
     
 
 

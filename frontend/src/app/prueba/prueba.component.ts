@@ -10,6 +10,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ChangeDetectorRef } from '@angular/core';
 import * as pdfjsLib from 'pdfjs-dist';
 import { getDocument } from 'pdfjs-dist';
+import { LoginService } from '../service/login.service';
 
 @Component({
   selector: 'app-prueba',
@@ -72,8 +73,13 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
     private pru: PruebaService,
     private modalService: NgbModal,
     private spe: SpecialtyService,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+    private login: LoginService
+  ) { 
+
+    this.userEspecialidad = this.login.getEspecialidad();
+
+  }
 
   ngOnInit() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.min.mjs';

@@ -14,12 +14,16 @@ export class FilterPipe implements PipeTransform {
     }
 
     return items.filter(item => {
+      
       let searchField = '';
-
+     
       if (item.name) {
         searchField = item.name;
       } else if (item.nombre) {
         searchField = item.nombre;
+      } else if(item.enunciado){
+        searchField = item.enunciado;
+
       }
 
       return searchField.toLowerCase().includes(searchText.toLowerCase());

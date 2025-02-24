@@ -219,7 +219,7 @@
 
 .pdf-filename-text {
   word-wrap: break-word; /* o overflow-wrap: break-word; */
-  overflow: hidden; /* Añadido para ocultar el desbordamiento */
-  /* ... otras propiedades ... */
+  overflow: hidden; 
+  
   background-color: #f8f9fa;
 }

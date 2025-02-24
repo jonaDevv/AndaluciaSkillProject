@@ -19,8 +19,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class EvaluacionItemUpdateDto {
 
+    private Long id;
+
+    private String description;
+
     @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
-    private String valoracion;
+    private float valoracion;
 
     @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "La justificacion debe ser un alfanumérico")
     private String justificacion;

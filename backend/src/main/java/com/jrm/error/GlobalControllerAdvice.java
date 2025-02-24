@@ -24,6 +24,7 @@ import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
+import com.jrm.error.user.NoExpertsAvailableException;
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.error.user.UsernameExistsException;
 
@@ -59,6 +60,13 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(PruebaNotFoundException.class)
     public ResponseEntity<ApiError> handleSpecialtyNotFound(PruebaNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+    @ExceptionHandler(NoExpertsAvailableException.class)
+    public ResponseEntity<ApiError> handleNoExpertsAvailable(NoExpertsAvailableException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);

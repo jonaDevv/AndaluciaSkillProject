@@ -100,10 +100,10 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**").permitAll()
                 
                 .requestMatchers("/files/**").permitAll() // Asegurar acceso público
-                .requestMatchers(HttpMethod.POST, "/participant","/prueba","/evaluacion","/evaluacionitem","/item").hasAuthority("ROLE_EXPERT")
-                .requestMatchers(HttpMethod.GET, "/specialty","/participant","/prueba","/evaluacion","/evaluacionitem","/item").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/participant/**","/prueba/**","/evaluacion/**","/evaluacion","/evaluacionitem/**","/item/**").hasAuthority("ROLE_EXPERT")
-                .requestMatchers(HttpMethod.DELETE, "/participant/**","/prueba/**","/evaluacion/**","/evaluacionitem/**","item/**").hasAuthority("ROLE_EXPERT")
+                .requestMatchers(HttpMethod.POST, "/participant","/prueba","/evaluaciones","/evaluacionitem","/item").hasAuthority("ROLE_EXPERT")
+                .requestMatchers(HttpMethod.GET, "/specialty","/participant","/prueba","/evaluaciones","/evaluaciones/**","/evaluacionitem","/item").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/participant/**","/prueba/**","/evaluaciones/**","/evaluacion","/evaluacionitem/**","/item/**").hasAuthority("ROLE_EXPERT")
+                .requestMatchers(HttpMethod.DELETE, "/participant/**","/prueba/**","/evaluaciones/**","/evaluacionitem/**","item/**").hasAuthority("ROLE_EXPERT")
                 
                 // Operaciones de escritura (solo ADMIN)
                 .requestMatchers(HttpMethod.GET, "/participant","item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")

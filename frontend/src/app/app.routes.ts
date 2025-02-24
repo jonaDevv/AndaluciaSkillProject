@@ -8,6 +8,7 @@ import { guardExpertGuard } from './autorizacion/guard-expert.guard';
 import { EspecialidadComponent } from './especialidad/especialidad.component';
 import { ParticipantComponent } from './participant/participant.component';
 import { PruebaComponent } from './prueba/prueba.component';
+import { EvaluacionComponent } from './evaluacion/evaluacion.component';
 
 export const routes: Routes = [
 
@@ -19,7 +20,7 @@ export const routes: Routes = [
             { path: '', redirectTo: 'participantes',pathMatch: 'full' },
             { path: 'participantes', component: ParticipantComponent, canActivate: [guardExpertGuard] },
             { path: 'pruebas', component: PruebaComponent, canActivate: [guardExpertGuard] },
-            { path: 'evaluaciones', component: ExpertComponent,canActivate: [guardExpertGuard]},
+            { path: 'evaluaciones', component: EvaluacionComponent,canActivate: [guardExpertGuard]},
            
         ]   
      },

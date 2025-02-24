@@ -4,8 +4,12 @@
   <!-- Buscador -->
   <div class="mb-3">
     <label for="search" class="form-label">Buscar por Nombre</label>
-    <input type="text" id="search" class="form-control" 
-           [(ngModel)]="searchText" placeholder="Escribe para filtrar">
+    <input type="text" 
+    id="search" 
+    class="form-control" 
+    [(ngModel)]="searchText" 
+    placeholder="Escribe el nombre para filtrar">
+    
   </div>
 
   <!-- Botón Nuevo -->
@@ -91,7 +95,7 @@
                   <ng-container *ngIf="isEditing">
                     <option [ngValue]="prueba.specialtyId" selected hidden> {{ prueba.specialtyName }} (Actual) </option>
                   </ng-container>
-                  <option *ngFor="let s of listSpecialty" [ngValue]="s.id">
+                  <option *ngFor="let s of listSpecialty | filter:userEspecialidad"  [ngValue]="s.id">
                     {{ s.name }}
                   </option>
                 </select>
@@ -109,7 +113,7 @@
                      accept="application/pdf"
                      (change)="onFileSelected($event)">
             
-              <small *ngIf="isEditing && prueba.pdfUrl" class="pdf-filename-text form-text text-muted">
+              <small *ngIf="isEditing && prueba.pdfUrl" class="pdf-filename-text form-text text-muted" style="max-width: 80px !important; overflow: hidden;">
                 PDF Actual: {{ prueba.pdfUrl.split('/').pop() }}
               </small>
             </div>

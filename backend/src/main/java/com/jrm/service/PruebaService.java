@@ -8,10 +8,17 @@ import org.springframework.stereotype.Service;
 
 import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
+import com.jrm.model.Participant;
 import com.jrm.model.Prueba;
+import com.jrm.model.Specialty;
+import com.jrm.model.User;
+import com.jrm.model.UserRole;
+import com.jrm.repository.ParticipantRepository;
 import com.jrm.repository.PruebaRepository;
+import com.jrm.repository.UserRepository;
 import com.jrm.service.base.BaseService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,6 +27,9 @@ public class PruebaService implements BaseService<Prueba, Long> {
 
     private final PruebaRepository pruebaRepository;
     private final FileStorageService fileStorageService; // Servicio para almacenar archivos
+    private final ParticipantRepository participantRepository;
+    private final UserRepository userRepository;
+    private final EvaluacionService evaluacionService;
 
     @Override
     public List<Prueba> findAll() {
@@ -30,7 +40,7 @@ public class PruebaService implements BaseService<Prueba, Long> {
     public Optional<Prueba> findById(Long id) {
         return pruebaRepository.findById(id);
     }
-
+    @Transactional
     @Override
     public Prueba save(Prueba prueba) {
         // Si la prueba tiene un archivo PDF pendiente de almacenar, se procesa aquí.
@@ -40,6 +50,24 @@ public class PruebaService implements BaseService<Prueba, Long> {
             // Quizás luego limpiar el campo pdfFile si no se persiste en la entidad
             prueba.setPdfFile(null);
         }
+
+        //Guardamos la prueba
+        Prueba savedPrueba = pruebaRepository.save(prueba);
+
+        // 2. Obtener participantes y expertos de la misma especialidad
+        Specialty specialty = savedPrueba.getSpecialty();
+        if (specialty != null) {
+            List<Participant> participants = participantRepository.findBySpecialtyId(specialty.getId());
+           
+            List<User> experts = userRepository.findExpertsBySpecialtyOrderByEvaluationCount(specialty.getId(), UserRole.EXPERT);
+            
+            if (!participants.isEmpty() && !experts.isEmpty()) {
+                participants.forEach(participant -> {
+                    evaluacionService.crearEvaluacion(participant, savedPrueba);
+                });
+            }
+        }
+        
         return pruebaRepository.save(prueba);
     }
 
