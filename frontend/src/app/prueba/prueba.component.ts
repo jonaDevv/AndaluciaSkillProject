@@ -24,9 +24,10 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
   prueba = {
     id: '',
     enunciado: '',
-    specialty: '',
+    specialtyId: '',
     specialtyName: '',
     items: [] as any[],
+    pdfUrl: null as string | null,
     pdfFile: null as File | null
   };
   @ViewChild('pdfModal') pdfModal!: TemplateRef<any>;
@@ -124,9 +125,10 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
     this.prueba = {
       id: '',
       enunciado: '',
-      specialty: '',
+      specialtyId: '',
       specialtyName: '',
       items: [],
+      pdfUrl: null,
       pdfFile: null
     };
     this.maxScoreCalculada = 0;
@@ -380,16 +382,36 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
     return this.prueba.items.reduce((total, item) => total + (+item.percentage || 0), 0);
   }
 
+  // private createFormData(): FormData {
+  //   const formData = new FormData();
+  //   formData.append('enunciado', this.prueba.enunciado);
+  //   formData.append('maxScore', this.maxScoreCalculada.toString());
+  //   formData.append('specialty', this.prueba.specialtyId);
+  //   // formData.append('items', JSON.stringify(this.prueba.items));
+
+  //   // Asegurarse de no enviar pruebaId en los items
+  //   const sanitizedItems = this.prueba.items.map(item => {
+  //     const { pruebaId, ...sanitizedItem } = item; // Eliminar pruebaId si está presente
+  //     return sanitizedItem;
+  //   });
+
+  //   formData.append('items', JSON.stringify(sanitizedItems));
+  //   if (this.prueba.pdfFile) {
+  //     formData.append('pdfFile', this.prueba.pdfFile);
+  //   }
+
+  //   return formData;
+  // }
+
   private createFormData(): FormData {
     const formData = new FormData();
     formData.append('enunciado', this.prueba.enunciado);
     formData.append('maxScore', this.maxScoreCalculada.toString());
-    formData.append('specialty', this.prueba.specialty);
-    // formData.append('items', JSON.stringify(this.prueba.items));
+    formData.append('specialty', this.prueba.specialtyId); // <-- IMPORTANTE: Usa specialtyId aquí
 
-    // Asegurarse de no enviar pruebaId en los items
     const sanitizedItems = this.prueba.items.map(item => {
-      const { pruebaId, ...sanitizedItem } = item; // Eliminar pruebaId si está presente
+      // ELIMINAR pruebaId e id de los items - ¡ESTA ES LA LÍNEA CRUCIAL!
+      const { pruebaId, id, ...sanitizedItem } = item;
       return sanitizedItem;
     });
 
@@ -397,7 +419,6 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
     if (this.prueba.pdfFile) {
       formData.append('pdfFile', this.prueba.pdfFile);
     }
-
     return formData;
   }
 
@@ -439,6 +460,7 @@ export class PruebaComponent implements OnInit, AfterViewInit { // Implementa Af
   }
 
   editarPrueba(prue: any, modalContent: TemplateRef<any>) {
+    console.log('Objeto "prue" recibido en editarPrueba:', prue);
     this.prueba = {
       ...prue,
       pdfFile: null,

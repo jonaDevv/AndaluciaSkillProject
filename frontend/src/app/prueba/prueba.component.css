@@ -216,3 +216,10 @@
 .modal-footer.justify-content-between {
   padding: 2px;
 }
+
+.pdf-filename-text {
+  word-wrap: break-word; /* o overflow-wrap: break-word; */
+  overflow: hidden; /* Añadido para ocultar el desbordamiento */
+  /* ... otras propiedades ... */
+  background-color: #f8f9fa;
+}

@@ -340,7 +340,12 @@ public class PruebaController {
             @RequestParam(value = "specialtyId", required = false) Long specialtyId,
             @RequestParam(value = "items", required = false) String itemsJson,
             @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile) {
-
+        System.out.println("Actualizando prueba: " + id
+        + " con enunciado: " + enunciado
+        + " y puntuación: " + maxScore
+        +   " y specialtyId: " + specialtyId
+        +   " y items: " + itemsJson
+        +   " y pdf: " + pdfFile);
         // Validar archivo PDF si se envía
         if (pdfFile != null && !pdfFile.getContentType().equals("application/pdf")) {
             return ResponseEntity.badRequest().body("El archivo debe ser un PDF");

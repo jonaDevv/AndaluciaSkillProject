@@ -86,8 +86,11 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Especialidad</label>
-                <select class="form-select" [(ngModel)]="prueba.specialty" name="specialty" required>
-                  <option [ngValue]="null" disabled>Seleccione especialidad</option>
+                <select class="form-select" [(ngModel)]="prueba.specialtyId" name="specialtyId" required>
+                  <option *ngIf="!isEditing" [ngValue]="null" disabled>Seleccione especialidad</option>
+                  <ng-container *ngIf="isEditing">
+                    <option [ngValue]="prueba.specialtyId" selected hidden> {{ prueba.specialtyName }} (Actual) </option>
+                  </ng-container>
                   <option *ngFor="let s of listSpecialty" [ngValue]="s.id">
                     {{ s.name }}
                   </option>
@@ -98,9 +101,17 @@
             <!-- Campo PDF -->
             <div class="mb-3">
               <label class="form-label">PDF</label>
-              <input type="file" class="form-control" 
-                     accept="application/pdf" 
+              <input *ngIf="!isEditing" type="file" class="form-control"
+                     accept="application/pdf"
                      (change)="onFileSelected($event)">
+            
+              <input *ngIf="isEditing" type="file" class="form-control"
+                     accept="application/pdf"
+                     (change)="onFileSelected($event)">
+            
+              <small *ngIf="isEditing && prueba.pdfUrl" class="pdf-filename-text form-text text-muted">
+                PDF Actual: {{ prueba.pdfUrl.split('/').pop() }}
+              </small>
             </div>
 
             <!-- Items -->
