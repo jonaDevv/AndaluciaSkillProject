@@ -42,6 +42,8 @@ export class EvaluacionService {
     );
   }
 
+  
+
   getDetails(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`, {
       headers: this.getHeaders()

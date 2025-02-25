@@ -155,6 +155,7 @@ import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.item.ItemCreateDto;
 import com.jrm.dto.item.ItemResponseDto;
 import com.jrm.dto.item.ItemUpdateDto;
+import com.jrm.error.ApiError;
 import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.model.Item;
@@ -162,12 +163,21 @@ import com.jrm.model.Prueba;
 import com.jrm.service.ItemService;
 import com.jrm.service.PruebaService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/item")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Gestión de Items", description = "Operaciones CRUD para la gestión de items de evaluación")
 public class ItemController {
     
     private final ItemService itemService;
@@ -175,6 +185,14 @@ public class ItemController {
     private final ConverterDto genericDto;
 
     // Obtener todos los Items
+    @Operation(summary = "Obtener todos los items", 
+               description = "Retorna una lista de todos los items de evaluación registrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de items encontrada",
+                   content = @Content(schema = @Schema(implementation = ItemResponseDto.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron items",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> getAllItems() {
         List<ItemResponseDto> items = itemService.findAll().stream()
@@ -185,6 +203,14 @@ public class ItemController {
     }
 
     // Obtener un Item por su ID
+    @Operation(summary = "Obtener item por ID", 
+    description = "Busca un item específico por su identificador único")
+    @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Item encontrado",
+            content = @Content(schema = @Schema(implementation = ItemResponseDto.class))),
+    @ApiResponse(responseCode = "404", description = "Item no encontrado",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long id) {
         return Optional.ofNullable(itemService.findById(id))
@@ -193,7 +219,18 @@ public class ItemController {
                 .orElseThrow(() -> new ItemNotFoundException(id));
     }
 
+
     // Crear un nuevo Item
+    @Operation(summary = "Crear nuevo item", 
+               description = "Crea un nuevo item de evaluación con los datos proporcionados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Item creado exitosamente",
+                   content = @Content(schema = @Schema(implementation = ItemResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "404", description = "Prueba relacionada no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping
     public ResponseEntity<ItemResponseDto> createItem(@RequestBody @Valid ItemCreateDto itemCreateDto) {
         // Convertir DTO a entidad
@@ -208,12 +245,23 @@ public class ItemController {
 
         // Guardar el Item y convertir a DTO de respuesta
         Item savedItem = itemService.save(item);
+
         ItemResponseDto responseDto = genericDto.genericConvert(savedItem, ItemResponseDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     // Actualizar un Item
+    @Operation(summary = "Actualizar item existente", 
+    description = "Actualiza los datos de un item de evaluación existente")
+    @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Item actualizado exitosamente",
+            content = @Content(schema = @Schema(implementation = ItemResponseDto.class))),
+    @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+            content = @Content(schema = @Schema(implementation = ApiError.class))),
+    @ApiResponse(responseCode = "404", description = "Item o prueba relacionada no encontrada",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ItemResponseDto> updateItem(@PathVariable Long id,
                                                       @Valid @RequestBody ItemUpdateDto itemUpdateDto) {
@@ -240,6 +288,13 @@ public class ItemController {
     }
 
     // Eliminar un Item
+    @Operation(summary = "Eliminar item", 
+               description = "Elimina permanentemente un item de evaluación del sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Item eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Item no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteItem(@PathVariable Long id) {
         return itemService.findById(id)

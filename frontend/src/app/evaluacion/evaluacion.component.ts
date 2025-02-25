@@ -133,6 +133,7 @@ verEvaluacion(evaluacionId: number) {
   }
 
   finalizarEvaluacion() {
+    
     this.evaluacionService.finalizar(this.evaluacionSeleccionada.id).subscribe({
       next: () => this.actualizarLista()
     });

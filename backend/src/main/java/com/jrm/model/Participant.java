@@ -33,11 +33,9 @@ public class Participant {
     private Long id;
 
     @NotNull(message = "El nombre del participante no puede ser nulo")
-  
     private String name;
 
     @NotNull(message = "El cntro educativo no puede ser nulo")
-   
     private String center;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")

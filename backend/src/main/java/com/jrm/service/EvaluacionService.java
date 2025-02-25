@@ -1,5 +1,7 @@
 package com.jrm.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -109,6 +111,7 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
 
         evaluacion.setItems(itemsEvaluacion); // Asignar items a la evaluación
 
+        
     
         return evaR.save(evaluacion);
     }
@@ -193,6 +196,7 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
     }
 
     public EvaluacionDetailsDTO finalizarEvaluacion(Long evaluacionId) {
+        
         Evaluacion evaluacion = evaR.findById(evaluacionId)
             .orElseThrow(() -> new RuntimeException("Evaluación no encontrada"));
         
@@ -251,20 +255,39 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
     }
 
 
+    // public List<ParticipantResponseDto> findGanadores() {
+    //         List<Evaluacion> ganadores = evaR.findGanadores();
+
+    //         List<ParticipantResponseDto> participantes = ganadores.stream()
+    //         .map(ganador -> {
+                
+    //             ParticipantResponseDto participante = converter.genericConvert(ganador.getParticipant(), ParticipantResponseDto.class);
+    //             participante.setTotalScore(ganador.getPrueba().getMaxScore());
+    //             return participante;
+                
+    //         }).toList();
+
+    //         return participantes;
+                
+    // }
+
+
     public List<ParticipantResponseDto> findGanadores() {
-            List<Evaluacion> ganadores = evaR.findGanadores();
+        List<Evaluacion> ganadores = evaR.findGanadores();
 
-            List<ParticipantResponseDto> participantes = ganadores.stream()
-            .map(ganador -> {
-                
-                ParticipantResponseDto participante = converter.genericConvert(ganador.getParticipant(), ParticipantResponseDto.class);
-                participante.setTotalScore(ganador.getPrueba().getMaxScore());
-                return participante;
-                
-            }).toList();
+        Map<Long, ParticipantResponseDto> participantesMap = new HashMap<>();
 
-            return participantes;
-                
+        for (Evaluacion ganador : ganadores) {
+            Long participantId = ganador.getParticipant().getId();
+            ParticipantResponseDto participante = participantesMap.getOrDefault(participantId, converter.genericConvert(ganador.getParticipant(), ParticipantResponseDto.class));
+            
+            float totalScore = participante.getTotalScore() + ganador.getPrueba().getMaxScore();
+            participante.setTotalScore(totalScore);
+
+            participantesMap.put(participantId, participante);
+        }
+
+        return new ArrayList<>(participantesMap.values());
     }
 
 

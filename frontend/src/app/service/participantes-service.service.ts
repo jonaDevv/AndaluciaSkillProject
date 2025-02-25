@@ -21,10 +21,7 @@ export class ParticipantesServiceService {
       
   }
 
-   // getAll(): Observable<any> {
-  //   return this.http.get('https://restcountries.com/v3.1/all');
-  // }
-
+  
   
 }
 

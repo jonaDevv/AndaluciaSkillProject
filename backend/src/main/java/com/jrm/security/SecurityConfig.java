@@ -94,10 +94,13 @@ public class SecurityConfig {
                 // Endpoints públicos
                 .requestMatchers(HttpMethod.POST,"/auth/login", "/auth/register").permitAll()
                 
-                .requestMatchers("swagger-ui.html").permitAll()
-                .requestMatchers("swagger-ui/**").permitAll()
-                .requestMatchers("swagger-resources/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers(
+    "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/webjars/**"
+            ).permitAll()
                 
                 .requestMatchers("/files/**").permitAll() // Asegurar acceso público
                 .requestMatchers(HttpMethod.POST, "/participant","/prueba","/evaluaciones","/evaluacionitem","/item").hasAuthority("ROLE_EXPERT")
@@ -122,9 +125,9 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:8080"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setMaxAge(3600L);
         

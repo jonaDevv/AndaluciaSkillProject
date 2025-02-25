@@ -16,6 +16,7 @@ export class FilterPipe implements PipeTransform {
     return items.filter(item => {
       
       let searchField = '';
+      
      
       if (item.name) {
         searchField = item.name;
@@ -23,8 +24,7 @@ export class FilterPipe implements PipeTransform {
         searchField = item.nombre;
       } else if(item.enunciado){
         searchField = item.enunciado;
-
-      }
+      } 
 
       return searchField.toLowerCase().includes(searchText.toLowerCase());
     });

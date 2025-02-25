@@ -220,6 +220,7 @@ import com.jrm.dto.converter.ConverterPrueba;
 import com.jrm.dto.item.ItemCreateDto;
 import com.jrm.dto.prueba.PruebaResponseDto;
 import com.jrm.dto.prueba.PruebaUpdateDto;
+import com.jrm.error.ApiError;
 import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
 import com.jrm.model.Prueba;
@@ -227,6 +228,15 @@ import com.jrm.model.Specialty;
 import com.jrm.model.Item; // Asegúrate de tener esta clase o DTO para los items
 import com.jrm.repository.PruebaRepository;
 import com.jrm.service.SpecialtyService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.jrm.service.FileStorageService;
 import com.jrm.service.ItemService;
 import com.jrm.service.PruebaService;
@@ -237,6 +247,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/prueba")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Gestión de Pruebas", description = "Operaciones CRUD para pruebas técnicas")
 public class PruebaController {
 
     private final PruebaService pruebaService;
@@ -248,6 +260,14 @@ public class PruebaController {
     // private final FileStorageService fileStorageService;
 
     // Obtener todas las pruebas
+    @Operation(summary = "Obtener todas las pruebas", 
+              description = "Retorna una lista completa de pruebas técnicas registradas")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de pruebas obtenida exitosamente",
+                   content = @Content(schema = @Schema(implementation = PruebaResponseDto.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron pruebas",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping
     public ResponseEntity<List<PruebaResponseDto>> getAllTests() {
         List<Prueba> pruebas = pruebaService.findAll();
@@ -259,6 +279,14 @@ public class PruebaController {
     }
 
     // Obtener una prueba por ID
+    @Operation(summary = "Obtener prueba por ID", 
+              description = "Busca una prueba técnica específica por su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Prueba encontrada",
+                   content = @Content(schema = @Schema(implementation = PruebaResponseDto.class))),
+        @ApiResponse(responseCode = "404", description = "Prueba no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<PruebaResponseDto> getTestById(@PathVariable Long id) {
         Prueba prueba = pruebaService.findById(id) // Buscar la entidad
@@ -279,6 +307,16 @@ public class PruebaController {
      */
     // Endpoint para crear una prueba con multipart/form-data
     // Crear prueba con items y archivo PDF
+    @Operation(summary = "Crear nueva prueba", 
+              description = "Crea una nueva prueba técnica con items y archivo PDF opcional")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Prueba creada exitosamente",
+                   content = @Content(schema = @Schema(implementation = PruebaResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "404", description = "Especialidad no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     public ResponseEntity<?> createPruebaMultipart(
@@ -330,7 +368,16 @@ public class PruebaController {
                 .body(genericDto.genericConvert(savedPrueba, PruebaResponseDto.class));
     }
 
-
+    @Operation(summary = "Actualizar prueba", 
+              description = "Actualiza una prueba existente con nuevos datos y archivos")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Prueba actualizada exitosamente",
+                   content = @Content(schema = @Schema(implementation = PruebaResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "404", description = "Prueba o especialidad no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     public ResponseEntity<?> updatePruebaMultipart(
@@ -400,6 +447,13 @@ public class PruebaController {
     }
 
     // Eliminar una prueba
+    @Operation(summary = "Eliminar prueba", 
+              description = "Elimina permanentemente una prueba técnica del sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Prueba eliminada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Prueba no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePrueba(@PathVariable Long id) {
         return pruebaService.findById(id)

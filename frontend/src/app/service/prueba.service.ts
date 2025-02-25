@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginService } from './login.service';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,17 @@ export class PruebaService {
     return this.http.get<any[]>(this.API_URL, {
       headers: this.getHeaders(),
       params
-    });
+    }).pipe(
+      map((pruebas: any[]) => {
+        console.log(pruebas);
+
+        return pruebas.filter(prueba=> prueba.specialtyName === especialidad);
+      }),
+      catchError(error => {
+        console.error('Error:', error);
+        return of([]);
+      })
+    );
   }
 
   addPrueba(formData: FormData): Observable<any> {

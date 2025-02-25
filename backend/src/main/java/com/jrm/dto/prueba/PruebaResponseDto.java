@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import com.jrm.dto.item.ItemResponseDto;
 import com.jrm.model.Specialty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,17 +36,22 @@ import lombok.NoArgsConstructor;
 @Validated
 public class PruebaResponseDto {
 
-  
+    @Schema(description = "ID de la prueba", example = "1")
     private Long id;
-   
+    
+    @Schema(description = "Enunciado de la prueba", example = "Resolución de matrices")
     private String enunciado;
 
+    @Schema(description = "Puntuacion máxima de la prueba", example = "100")
     private float maxScore;
 
+    @Schema(description = "URL del PDF asociado", example = "http://ejemplo.com/instrucciones.pdf")
     private String pdfUrl;
-
+    
+    @Schema(description = "Nombre de la especialidad", example = "Matemáticas")
     private String specialtyName;
 
+    @Schema(description = "Lista de item", example = "Matriz, Vector, Determinante")
     private List<ItemResponseDto> items = new ArrayList<>();
 
 }

@@ -9,6 +9,7 @@ import { EspecialidadComponent } from './especialidad/especialidad.component';
 import { ParticipantComponent } from './participant/participant.component';
 import { PruebaComponent } from './prueba/prueba.component';
 import { EvaluacionComponent } from './evaluacion/evaluacion.component';
+import { GanadoresComponent } from './ganadores/ganadores.component';
 
 export const routes: Routes = [
 
@@ -17,7 +18,7 @@ export const routes: Routes = [
 
     { path: 'expert', canActivate: [guardExpertGuard],
         children: [
-            { path: '', redirectTo: 'participantes',pathMatch: 'full' },
+            { path: '', redirectTo: 'evaluaciones',pathMatch: 'full' },
             { path: 'participantes', component: ParticipantComponent, canActivate: [guardExpertGuard] },
             { path: 'pruebas', component: PruebaComponent, canActivate: [guardExpertGuard] },
             { path: 'evaluaciones', component: EvaluacionComponent,canActivate: [guardExpertGuard]},
@@ -28,7 +29,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'expertos', pathMatch: 'full' },
             { path: 'expertos', component:ExpertComponent ,canActivate: [guardAdminGuard] },
-            { path: 'ganadores', component: AdminComponent, canActivate: [guardAdminGuard],pathMatch: 'full' },
+            { path: 'ganadores', component: GanadoresComponent, canActivate: [guardAdminGuard],pathMatch: 'full' },
             { path: 'especialidad', component:EspecialidadComponent,canActivate: [guardAdminGuard], pathMatch: 'full' },
            
         ]

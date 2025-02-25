@@ -21,6 +21,14 @@ import com.jrm.model.User;
 import com.jrm.service.ApiErrorService;
 import com.jrm.service.SpecialtyService;
 import com.jrm.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +38,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Gestión de Usuarios", description = "Operaciones CRUD para usuarios del sistema")
 public class UserController {
 
     private final UserService userService;
@@ -38,6 +48,15 @@ public class UserController {
     private final ConverterDto genericDto;
     private final ApiErrorService apiErrorService;
 
+
+    @Operation(summary = "Obtener todos los usuarios", 
+              description = "Retorna una lista completa de usuarios registrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente",
+                   content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron usuarios",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         List<User> users = userService.findAll();
@@ -51,6 +70,15 @@ public class UserController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+    @Operation(summary = "Obtener usuario por ID", 
+              description = "Busca un usuario específico por su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado",
+                   content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@Valid @PathVariable Long id) {
         return userService.findByIdd(id)
@@ -60,6 +88,18 @@ public class UserController {
     }
     
 
+    @Operation(summary = "Crear nuevo usuario", 
+              description = "Registra un nuevo usuario en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente",
+                   content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto de datos únicos (DNI o usuario ya existen)",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userDto) {
         
@@ -93,6 +133,19 @@ public class UserController {
         
     }
 
+
+    @Operation(summary = "Actualizar usuario", 
+              description = "Actualiza los datos de un usuario existente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario actualizado exitosamente",
+                   content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto de datos únicos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
         
@@ -135,6 +188,14 @@ public class UserController {
        
     }
 
+
+    @Operation(summary = "Eliminar usuario", 
+              description = "Elimina permanentemente un usuario del sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@Valid @PathVariable Long id) {
         

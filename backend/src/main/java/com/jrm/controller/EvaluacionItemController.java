@@ -22,6 +22,7 @@ import com.jrm.dto.evaluacionItem.EvaluacionItemCreateDto;
 import com.jrm.dto.evaluacionItem.EvaluacionItemDTO;
 import com.jrm.dto.evaluacionItem.EvaluacionItemResponseDto;
 import com.jrm.dto.evaluacionItem.EvaluacionItemUpdateDto;
+import com.jrm.error.ApiError;
 import com.jrm.error.evaluacion.EvaluacionNotFoundException;
 import com.jrm.error.evaluacionitem.EvaluacionItemNotFoundException;
 import com.jrm.model.Evaluacion;
@@ -31,12 +32,21 @@ import com.jrm.service.EvaluacionItemService;
 import com.jrm.service.EvaluacionService;
 import com.jrm.service.ItemService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/evaluacionitem")
 @RequiredArgsConstructor
+@Tag(name = "Items de Evaluación", description = "Gestión de items individuales de evaluación")
+@SecurityRequirement(name = "bearerAuth")
 public class EvaluacionItemController {
 
     private final EvaluacionService evService;
@@ -45,7 +55,13 @@ public class EvaluacionItemController {
     private final EvaluacionItemService evItemService;
 
 
-
+    @Operation(summary = "Obtener todos los items de evaluación", 
+               description = "Lista completa de items de evaluación registrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de items obtenida exitosamente"),
+        @ApiResponse(responseCode = "404", description = "No se encontraron items",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping
     public ResponseEntity<?> getAllEvaluacionItems() {
         List<EvaluacionItem> evaluacionItems = evItemService.findAll();
@@ -59,6 +75,15 @@ public class EvaluacionItemController {
     }
 
 
+
+    @Operation(summary = "Obtener item por ID", 
+               description = "Obtener un item de evaluación específico por su ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Item encontrado",
+                   content = @Content(schema = @Schema(implementation = EvaluacionItemResponseDto.class))),
+        @ApiResponse(responseCode = "404", description = "Item no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping("/id")
     public ResponseEntity<?> getEvaluacionItemId(@PathVariable Long id)
     {
@@ -70,6 +95,14 @@ public class EvaluacionItemController {
     }
 
 
+    @Operation(summary = "Crear nuevo item de evaluación", 
+               description = "Crear un nuevo item de evaluación con los datos proporcionados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Item creado exitosamente",
+                   content = @Content(schema = @Schema(implementation = EvaluacionItemResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping
     public ResponseEntity<?> createEvaluacionItem(@RequestBody EvaluacionItemCreateDto dto) {
         
@@ -81,10 +114,21 @@ public class EvaluacionItemController {
         EvaluacionItem savedEvaluacionItem = evItemService.save(evaluacionItem);
 
         EvaluacionItemResponseDto responseDto = genericConverter.genericConvert(savedEvaluacionItem, EvaluacionItemResponseDto.class);
-
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
+
+    @Operation(summary = "Actualizar item de evaluación", 
+    description = "Actualizar un item de evaluación existente")
+    @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Item actualizado exitosamente",
+            content = @Content(schema = @Schema(implementation = EvaluacionItemResponseDto.class))),
+    @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+            content = @Content(schema = @Schema(implementation = ApiError.class))),
+    @ApiResponse(responseCode = "404", description = "Item no encontrado",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvaluacionItem(@PathVariable Long id, @Valid @RequestBody EvaluacionItemUpdateDto dto) {
         
@@ -101,6 +145,14 @@ public class EvaluacionItemController {
         
     }
 
+
+    @Operation(summary = "Eliminar item de evaluación", 
+               description = "Eliminar permanentemente un item de evaluación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Item eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Item no encontrado",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvaluacionItem(@PathVariable Long id) {
         
@@ -111,6 +163,32 @@ public class EvaluacionItemController {
                 })
                 .orElseThrow(() -> new EvaluacionItemNotFoundException(id)); // Lanzar excepción si no se encuentra el usuario
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public EvaluacionItem updateEvaluacionItem(Long itemId, EvaluacionItemDTO dto) {
         EvaluacionItem item = evItemService.findById(itemId)

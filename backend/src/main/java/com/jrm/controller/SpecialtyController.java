@@ -15,6 +15,13 @@ import com.jrm.model.Specialty;
 import com.jrm.service.ApiErrorService;
 import com.jrm.service.SpecialtyService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +31,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/specialty")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Gestión de Especialidades", description = "Operaciones CRUD para especialidades técnicas")
 public class SpecialtyController {
 
     private final SpecialtyService specialtyService;
@@ -31,6 +40,14 @@ public class SpecialtyController {
     private final ApiErrorService apiErrorService;
 
     // Obtener todas las especialidades
+    @Operation(summary = "Obtener todas las especialidades", 
+               description = "Retorna una lista completa de especialidades registradas")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de especialidades encontrada",
+                   content = @Content(schema = @Schema(implementation = SpecialtyResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron especialidades",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping
     public ResponseEntity<List<SpecialtyResponseDTO>> getAllSpecialties() {
        
@@ -46,6 +63,14 @@ public class SpecialtyController {
     }
 
     // Obtener una especialidad por ID
+    @Operation(summary = "Obtener especialidad por ID", 
+               description = "Busca una especialidad específica por su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Especialidad encontrada",
+                   content = @Content(schema = @Schema(implementation = SpecialtyResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Especialidad no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<SpecialtyResponseDTO> getSpecialtyById(@PathVariable Long id) {
         return Optional.ofNullable(specialtyService.findById(id))
@@ -55,6 +80,18 @@ public class SpecialtyController {
     }
 
     // Crear una nueva especialidad
+    @Operation(summary = "Crear nueva especialidad", 
+               description = "Registra una nueva especialidad técnica en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Especialidad creada exitosamente",
+                   content = @Content(schema = @Schema(implementation = SpecialtyResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto de datos únicos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping
     public ResponseEntity<?> createSpecialty(
             @Valid @RequestBody SpecialtyCreateDto specialtyCreateDTO) {
@@ -83,7 +120,18 @@ public class SpecialtyController {
     }
 
    
-
+    @Operation(summary = "Actualizar especialidad", 
+               description = "Actualiza los datos de una especialidad existente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Especialidad actualizada exitosamente",
+                   content = @Content(schema = @Schema(implementation = SpecialtyResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "404", description = "Especialidad no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto de datos únicos",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSpecialty(
             @PathVariable Long id,
@@ -113,6 +161,13 @@ public class SpecialtyController {
     }
 
     // Eliminar una especialidad
+    @Operation(summary = "Eliminar especialidad", 
+               description = "Elimina permanentemente una especialidad del sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Especialidad eliminada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Especialidad no encontrada",
+                   content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSpecialty(@PathVariable Long id) {
         
