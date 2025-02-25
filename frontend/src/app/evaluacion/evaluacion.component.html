@@ -8,10 +8,10 @@
       </div>
       <div class="evaluacion-info">
         <span class="puntuacion">
-          <b>Puntuación: </b>
+          <!-- <b>Puntuación: </b>
           {{ evaluacion.pfinalObtenida || 0 | number:'1.2-2' }} / {{ evaluacion.pruebaMaxScore || 0 }}
           <br>
-          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}%
+          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}% -->
         </span>
         <span class="estado" [ngClass]="{'finalizada': evaluacion.estado === 'FINALIZADA'}">
           {{ evaluacion.estado || 'PENDIENTE' }}
@@ -35,10 +35,10 @@
       </div>
       <div class="evaluacion-info">
         <span class="puntuacion">
-          <b>Puntuación: </b>
+          <!-- <b>Puntuación: </b>
           {{ evaluacion.pfinalObtenida || 0 | number:'1.2-2' }} / {{ evaluacion.pruebaMaxScore || 0 }}
           <br>
-          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}%
+          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}% -->
         </span>
         <span class="estado finalizada">
           FINALIZADA

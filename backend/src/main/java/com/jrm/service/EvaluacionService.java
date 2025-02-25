@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.jrm.dto.converter.ConverterDto;
 import com.jrm.dto.evaluacion.EvaluacionDTO;
 import com.jrm.dto.evaluacion.EvaluacionDetailsDTO;
 import com.jrm.dto.evaluacionItem.EvaluacionItemDTO;
+import com.jrm.dto.participant.ParticipantResponseDto;
 import com.jrm.error.evaluacion.EvaluacionNotFoundException;
 import com.jrm.error.user.NoExpertsAvailableException;
 import com.jrm.error.user.UserNotFoundException;
@@ -27,6 +29,7 @@ import com.jrm.repository.UserRepository;
 import com.jrm.repository.projection.ReasignacionStats;
 import com.jrm.service.base.BaseService;
 
+import ch.qos.logback.core.pattern.Converter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +39,8 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
     
     private final EvaluacionRepository evaR;
     private final UserRepository userRepository;
+    private final ParticipantService servicioParticipant;
+    private final ConverterDto converter;
    
   
     @Override
@@ -243,6 +248,23 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
         
         return evaR.findByIdWithItems(id)
             .orElseThrow(() -> new EvaluacionNotFoundException(id));
+    }
+
+
+    public List<ParticipantResponseDto> findGanadores() {
+            List<Evaluacion> ganadores = evaR.findGanadores();
+
+            List<ParticipantResponseDto> participantes = ganadores.stream()
+            .map(ganador -> {
+                
+                ParticipantResponseDto participante = converter.genericConvert(ganador.getParticipant(), ParticipantResponseDto.class);
+                participante.setTotalScore(ganador.getPrueba().getMaxScore());
+                return participante;
+                
+            }).toList();
+
+            return participantes;
+                
     }
 
 

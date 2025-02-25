@@ -25,6 +25,7 @@ import com.jrm.dto.evaluacion.EvaluacionDetailsDTO;
 import com.jrm.dto.evaluacion.EvaluacionResponseDto;
 import com.jrm.dto.evaluacion.EvaluacionUpdateDto;
 import com.jrm.dto.evaluacionItem.EvaluacionItemDTO;
+import com.jrm.dto.participant.ParticipantResponseDto;
 import com.jrm.error.evaluacion.EvaluacionNotFoundException;
 import com.jrm.error.user.NoExpertsAvailableException;
 import com.jrm.model.Evaluacion;
@@ -171,6 +172,19 @@ public class EvaluacionController {
             .toList();
         
         return ResponseEntity.ok(dtos);
+    }
+
+
+    // Endpoint para obtener los ganadores
+    @GetMapping("/ganadores")
+    public ResponseEntity<?> obtenerGanadores() {
+        try {
+            List<ParticipantResponseDto> ganadores = evaluacionService.findGanadores();
+            return ResponseEntity.ok(ganadores);
+        } catch (Exception ex) {
+            // Manejo de error adecuado
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")

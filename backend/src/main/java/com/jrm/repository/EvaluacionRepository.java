@@ -44,6 +44,15 @@ public interface EvaluacionRepository extends JpaRepository<Evaluacion, Long> {
         @Param("estado") String estado
     );
 
+
+
+    @Query("SELECT e FROM Evaluacion e " +
+       "WHERE e.estado = 'FINALIZADA' " +
+       "AND e.pFinalObtenida = (" +
+         "SELECT MAX(e2.pFinalObtenida) FROM Evaluacion e2 " +
+         "WHERE e2.prueba = e.prueba AND e2.estado = 'FINALIZADA'" +
+       ")")
+    List<Evaluacion> findGanadores();
     
 
 
