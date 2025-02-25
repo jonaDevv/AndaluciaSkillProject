@@ -200,6 +200,10 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
         return evaR.findByUserUsernameAndEstado(username, "PENDIENTE");
     }
 
+    public List<Evaluacion> findFinalizadasByUser(String username) {
+        return evaR.findByUserUsernameAndEstado(username, "FINALIZADA");
+    }
+
 
     public EvaluacionDetailsDTO getEvaluacionDetails(Long id) {
         Evaluacion evaluacion = evaR.findByIdWithItems(id)
@@ -293,6 +297,7 @@ public class EvaluacionService implements BaseService<Evaluacion, Long> {
             .participantName(evaluacion.getParticipant().getName()) // Asume que Participant tiene getName()
             .pruebaId(evaluacion.getPrueba().getId())
             .pruebaEnunciado(evaluacion.getPrueba().getEnunciado())
+            .pruebaMaxScore(evaluacion.getPrueba().getMaxScore())
             .userId(evaluacion.getUser().getId())
             .userUsername(evaluacion.getUser().getUsername())
             .build();

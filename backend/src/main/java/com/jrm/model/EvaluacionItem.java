@@ -36,7 +36,8 @@ public class EvaluacionItem {
 
     
     private String description;
-    @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "La justificacion debe ser un alfanumérico")
+   
+    
     private String justificacion;
 
     @ManyToOne

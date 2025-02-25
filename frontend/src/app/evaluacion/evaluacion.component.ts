@@ -1,18 +1,13 @@
-// En app.module.ts
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-
+import { forkJoin } from 'rxjs';
 import { EvaluacionService } from '../service/evaluacion.service';
-
 import { CommonModule } from '@angular/common';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
-
 
 @Component({
   selector: 'app-evaluaciones',
@@ -30,13 +25,16 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./evaluacion.component.css']
 })
 export class EvaluacionComponent implements OnInit {
-  evaluaciones: any[] = [];
+  evaluacionesPendientes: any[] = [];
+  evaluacionesFinalizadas: any[] = [];
   evaluacionSeleccionada: any = null;
   evaluacionForm: FormGroup;
+  modoLectura: boolean = false; // Cuando es true, la evaluación se muestra solo para ver
 
   constructor(
     private evaluacionService: EvaluacionService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef
   ) {
     this.evaluacionForm = this.fb.group({
       items: this.fb.array([])
@@ -45,6 +43,7 @@ export class EvaluacionComponent implements OnInit {
 
   ngOnInit() {
     this.cargarEvaluaciones();
+    this.cargarEvaluacionesFinalizadas();
   }
 
   get itemsFormArray() {
@@ -54,56 +53,81 @@ export class EvaluacionComponent implements OnInit {
   cargarEvaluaciones() {
     this.evaluacionService.getPendientes().subscribe({
       next: (data) => {
-        console.log('Datos recibidos en el componente:', data);
-        this.evaluaciones = data;
+        console.log('Evaluaciones pendientes recibidas:', data);
+        this.evaluacionesPendientes = data;
       },
-      error: (err) => console.error('Error cargando evaluaciones:', err)
+      error: (err) => console.error('Error cargando evaluaciones pendientes:', err)
     });
   }
 
-  seleccionarEvaluacion(evaluacionId: number) {
-    this.evaluacionService.getDetails(evaluacionId).subscribe({
+  cargarEvaluacionesFinalizadas() {
+    this.evaluacionService.getFinalizadas().subscribe({
       next: (data) => {
-        console.log('DETALLES DE EVALUACIÓN:', data); // ← Agrega este log
-        this.evaluacionSeleccionada = data;
-        this.inicializarFormulario(data.items);
+        console.log('Evaluaciones finalizadas recibidas:', data);
+        this.evaluacionesFinalizadas = data;
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('Error cargando evaluaciones finalizadas:', err)
     });
   }
 
-  // evaluacion.component.ts
+  // Para modo edición (pendientes)
+seleccionarEvaluacion(evaluacionId: number) {
+  this.modoLectura = false;
+  this.evaluacionService.getDetails(evaluacionId).subscribe({
+    next: (data) => {
+      console.log('DETALLES DE EVALUACIÓN:', data);
+      this.evaluacionSeleccionada = data;
+      this.inicializarFormulario(data.items);
+      this.cd.detectChanges();
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+// Para modo sólo lectura (finalizadas)
+verEvaluacion(evaluacionId: number) {
+  this.modoLectura = true;
+  this.evaluacionService.getDetails(evaluacionId).subscribe({
+    next: (data) => {
+      console.log('DETALLES DE EVALUACIÓN (modo lectura):', data);
+      this.evaluacionSeleccionada = data;
+      this.inicializarFormulario(data.items);
+      this.cd.detectChanges();
+    },
+    error: (err) => console.error(err)
+  });
+}
+
   inicializarFormulario(items: any[]) {
     this.itemsFormArray.clear();
     
     items.forEach(item => {
-      this.itemsFormArray.push(this.fb.group({
+      const grupo = this.fb.group({
         id: [item.id],
-        valoracion: [item.valoracion || 0, [Validators.required, Validators.min(0), Validators.max(100)]],
-        justificacion: [item.justificacion || ''],
-        itemId: [item.itemId], 
-        description: [item.description] 
-      }));
+        valoracion: [{ value: item.valoracion ?? 0, disabled: this.modoLectura }, [Validators.required, Validators.min(0), Validators.max(100)]],
+        justificacion: [{ value: item.justificacion || '', disabled: this.modoLectura }],
+        itemId: [item.itemId],
+        description: [item.description]
+      });
+      
+      this.itemsFormArray.push(grupo);
     });
     
-    console.log('FORMULARIO INICIALIZADO:', this.itemsFormArray.value); // Debug
-  }
-
-  // Agregar para manejar posibles valores nulos
-  get pruebaMaxScore(): number {
-    return this.evaluacionSeleccionada?.pruebaMaxScore || 0;
+    console.log('FORMULARIO INICIALIZADO:', this.itemsFormArray.value);
   }
 
   guardarEvaluacion() {
     if (this.evaluacionForm.valid) {
-      const updates = this.itemsFormArray.value.map((item: any) => 
+      const updateObservables = this.itemsFormArray.value.map((item: any) =>
         this.evaluacionService.updateItem(item.id, item)
       );
-
-      Promise.all(updates).then(() => {
-        this.evaluacionService.calcular(this.evaluacionSeleccionada.id).subscribe({
-          next: () => this.actualizarLista()
-        });
+      forkJoin(updateObservables).subscribe({
+        next: () => {
+          this.evaluacionService.calcular(this.evaluacionSeleccionada.id).subscribe({
+            next: () => this.actualizarLista()
+          });
+        },
+        error: (err) => console.error('Error actualizando ítems:', err)
       });
     }
   }
@@ -116,11 +140,13 @@ export class EvaluacionComponent implements OnInit {
 
   actualizarLista() {
     this.cargarEvaluaciones();
+    this.cargarEvaluacionesFinalizadas();
     this.cerrarModal();
   }
 
   cerrarModal() {
     this.evaluacionSeleccionada = null;
     this.evaluacionForm.reset();
+    this.modoLectura = false;
   }
 }

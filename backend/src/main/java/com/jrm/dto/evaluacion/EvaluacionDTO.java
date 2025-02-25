@@ -27,6 +27,7 @@ public class EvaluacionDTO {
     // Datos de la prueba
     private Long pruebaId;
     private String pruebaEnunciado;
+    private float pruebaMaxScore;
     
     // Datos del experto
     private Long userId;

@@ -161,6 +161,18 @@ public class EvaluacionController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/finalizada")
+    public ResponseEntity<List<EvaluacionDTO>> getEvaluacionesFinalizadas(
+        @AuthenticationPrincipal UserDetails userDetails) {
+        
+        List<Evaluacion> evaluaciones = evaluacionService.findFinalizadasByUser(userDetails.getUsername());
+        List<EvaluacionDTO> dtos = evaluaciones.stream()
+            .map(evaluacionService::convertToDTO)
+            .toList();
+        
+        return ResponseEntity.ok(dtos);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EvaluacionDetailsDTO> getEvaluacionDetails(@PathVariable Long id) {
         return ResponseEntity.ok(evaluacionService.getEvaluacionDetails(id));

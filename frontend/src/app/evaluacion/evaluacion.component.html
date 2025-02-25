@@ -1,81 +1,92 @@
-<!-- evaluaciones.component.html -->
 <div class="container">
-    <!-- Lista de evaluaciones -->
-    <div class="evaluaciones-list">
-      <div *ngFor="let evaluacion of evaluaciones" 
-           class="evaluacion-item"
-           [class.finalizada]="evaluacion.estado === 'FINALIZADA'">
-        
-        <div class="evaluacion-header">
-          <!-- Cambiar evaluacion.prueba.enunciado por evaluacion.pruebaEnunciado -->
-          <h3>{{ evaluacion.pruebaEnunciado }}</h3>
-          <!-- Cambiar evaluacion.participant.participantName por evaluacion.participantName -->
-          <p>Participante: {{ evaluacion.participantName }}</p>
-        </div>
-
-        <div class="evaluacion-info">
-          <span class="puntuacion">
-            <!-- Agregar validación para maxScore -->
-            {{ evaluacion.pFinalObtenida || 0 | number:'1.2-2' }} / {{ evaluacion.pruebaMaxScore || 0 }}
-          </span>
-          <span class="estado" [ngClass]="{'finalizada': evaluacion.estado === 'FINALIZADA'}">
-            {{ evaluacion.estado || 'PENDIENTE' }}
-          </span>
-        </div>
-
-        <button mat-raised-button 
-                color="primary" 
-                (click)="seleccionarEvaluacion(evaluacion.id)"
-                [disabled]="evaluacion.estado === 'FINALIZADA'">
-          Evaluar
-        </button>
+  <h2>Evaluaciones Pendientes</h2>
+  <div class="evaluaciones-list">
+    <div *ngFor="let evaluacion of evaluacionesPendientes" class="evaluacion-item">
+      <div class="evaluacion-header">
+        <h3>{{ evaluacion.pruebaEnunciado }}</h3>
+        <p>Participante: {{ evaluacion.participantName }}</p>
       </div>
+      <div class="evaluacion-info">
+        <span class="puntuacion">
+          <b>Puntuación: </b>
+          {{ evaluacion.pfinalObtenida || 0 | number:'1.2-2' }} / {{ evaluacion.pruebaMaxScore || 0 }}
+          <br>
+          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}%
+        </span>
+        <span class="estado" [ngClass]="{'finalizada': evaluacion.estado === 'FINALIZADA'}">
+          {{ evaluacion.estado || 'PENDIENTE' }}
+        </span>
+      </div>
+      <button mat-raised-button
+              color="primary"
+              (click)="seleccionarEvaluacion(evaluacion.id)"
+              [disabled]="evaluacion.estado === 'FINALIZADA'">
+        Evaluar
+      </button>
+    </div>
+  </div>
+
+  <h2>Evaluaciones Finalizadas</h2>
+  <div class="evaluaciones-list">
+    <div *ngFor="let evaluacion of evaluacionesFinalizadas" class="evaluacion-item finalizada">
+      <div class="evaluacion-header">
+        <h3>{{ evaluacion.pruebaEnunciado }}</h3>
+        <p>Participante: {{ evaluacion.participantName }}</p>
+      </div>
+      <div class="evaluacion-info">
+        <span class="puntuacion">
+          <b>Puntuación: </b>
+          {{ evaluacion.pfinalObtenida || 0 | number:'1.2-2' }} / {{ evaluacion.pruebaMaxScore || 0 }}
+          <br>
+          <b>Porcentaje: </b>{{ evaluacion.porcentajeFinalObtenido || 0 | number:'1.2-2' }} / {{ 100  }}%
+        </span>
+        <span class="estado finalizada">
+          FINALIZADA
+        </span>
+      </div>
+      <button mat-raised-button color="primary" (click)="verEvaluacion(evaluacion.id)">
+        Ver
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para evaluar o ver -->
+  <div class="evaluacion-modal" *ngIf="evaluacionSeleccionada">
+    <div class="modal-header">
+      <h2 >Evaluaciones</h2>
+      <button mat-raised-button color="warn" (click)="cerrarModal()">Cerrar</button>
     </div>
 
-    <!-- Modal de evaluación -->
-    <div class="evaluacion-modal" *ngIf="evaluacionSeleccionada">
-      <div class="modal-header">
-        <!-- Cambiar evaluacionSeleccionada.participant.nombre por evaluacionSeleccionada.participantName -->
-        <h2>Evaluación de {{ evaluacionSeleccionada.participantName }}</h2>
-        <button mat-icon-button (click)="cerrarModal()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <form [formGroup]="evaluacionForm" class="modal-content">
-        <div formArrayName="items">
-            <div *ngFor="let itemGroup of itemsFormArray.controls; let i = index" 
-                 [formGroupName]="i"
-                 class="item-evaluacion">
-              
-              <!-- Usar itemGroup.get('description') en lugar de evaluacionSeleccionada -->
-              <h4>{{ itemGroup.get('description')?.value }}</h4>
-            
-              <div class="slider-container">
-                <mat-slider thumbLabel min="0" max="100" formControlName="valoracion">
-                  <input matSliderThumb>
-                </mat-slider>
-                <span class="valoracion-display">
-                  {{ itemGroup.get('valoracion')?.value }}%
-                </span>
-              </div>
-          
-              <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Justificación</mat-label>
-                <textarea matInput formControlName="justificacion" rows="3"></textarea>
-              </mat-form-field>
-            </div>
+    <form [formGroup]="evaluacionForm" class="modal-content">
+      <div formArrayName="items">
+        <div *ngFor="let itemGroup of itemsFormArray.controls; let i = index"
+             [formGroupName]="i" class="item-evaluacion">
+          <h4>{{ evaluacionSeleccionada.items[i].description }}</h4>
+          <div class="slider-container">
+            <mat-slider thumbLabel min="0" max="100" [step]="1">
+              <input matSliderThumb type="range" formControlName="valoracion" />
+            </mat-slider>
+            <span class="valoracion-display">
+              {{ itemGroup.get('valoracion')?.value }}%
+            </span>
           </div>
-
-        <div class="modal-actions">
-          <button mat-raised-button color="warn" (click)="cerrarModal()">Cancelar</button>
-          <button mat-raised-button color="primary" (click)="guardarEvaluacion()">Guardar</button>
-          <button mat-raised-button color="accent" 
-                  (click)="finalizarEvaluacion()"
-                  [disabled]="evaluacionSeleccionada.estado === 'FINALIZADA'">
-            Finalizar
-          </button>
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Justificación</mat-label>
+            <textarea matInput formControlName="justificacion" rows="3"></textarea>
+          </mat-form-field>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <!-- Acciones: si es modo edición (pendiente) se muestran Guardar/Finalizar; si es lectura (finalizada) solo se muestra Cerrar -->
+      <div class="modal-actions" *ngIf="!modoLectura">
+        <button mat-raised-button color="warn" (click)="cerrarModal()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="guardarEvaluacion()">Guardar</button>
+        <button mat-raised-button color="accent"
+                (click)="finalizarEvaluacion()"
+                [disabled]="evaluacionSeleccionada.estado === 'FINALIZADA'">
+          Finalizar
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
