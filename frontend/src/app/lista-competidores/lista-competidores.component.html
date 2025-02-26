@@ -1,0 +1,20 @@
+<div id="contenedorListaCompetidores" class="container mt-5">
+    <h1 class="text-center mb-4">Lista de Competidores</h1>
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+               
+                <th scope="col">Nombre</th>
+                <th scope="col">Centro</th>
+                <th scope="col">Especialidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let participante of listaParticipantes">
+                <td>{{participante.name}}</td>
+                <td>{{participante.center}}</td>
+                <td>{{participante.specialtyName}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

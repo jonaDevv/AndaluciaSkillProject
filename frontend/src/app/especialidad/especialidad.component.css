@@ -1,0 +1,12 @@
+.modal {
+    display: flex !important;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-dialog-centered {
+    min-height: calc(100% - 1rem);
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+}

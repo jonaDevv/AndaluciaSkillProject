@@ -1,0 +1,36 @@
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    margin-top: 300px;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-teal {
+    max-width: 500px;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    margin-top:300px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(44, 165, 141, 0.2);
+}
+
+.btn-light-teal {
+    background-color: #e6f4f1;
+    color: #1f8470;
+    border: 2px solid #2ca58d;
+}
+
+.btn-danger-teal {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn-danger-teal:hover {
+    background-color: #ff5252;
+    transform: translateY(-2px);
+}

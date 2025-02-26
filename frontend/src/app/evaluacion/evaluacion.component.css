@@ -1,0 +1,145 @@
+/* evaluaciones.component.css - Estilos consolidados */
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Encabezados de sección */
+.container h2 {
+  margin: 20px 0 10px;
+  color: #333;
+}
+
+/* Lista de evaluaciones */
+.evaluaciones-list {
+  display: grid;
+  gap: 20px;
+}
+
+/* Item de evaluación */
+.evaluacion-item {
+  margin: 1rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.evaluacion-item:hover {
+  transform: translateY(-2px);
+}
+
+/* Encabezado de la evaluación */
+.evaluacion-header {
+  margin-bottom: 15px;
+}
+
+/* Información de la evaluación */
+.evaluacion-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Puntuación */
+.puntuacion {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* Estado pendiente (azul por defecto) */
+.estado {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #3498db;
+  color: white;
+  font-size: 0.9em;
+}
+
+/* Estado finalizada (naranja) */
+.estado.finalizada {
+  background: #e67e22;
+}
+
+/* Modal de evaluación */
+.evaluacion-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 800px;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Encabezado del modal */
+.evaluacion-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+/* Contenido del modal */
+.evaluacion-modal .modal-content {
+  overflow-y: auto;
+  padding-right: 15px;
+  margin-top: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cada ítem dentro del modal */
+.item-evaluacion {
+  margin-bottom: 25px;
+  padding: 15px;
+  border: 1px solid #ecf0f1;
+  border-radius: 6px;
+}
+
+/* Contenedor del slider */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 15px 0;
+}
+
+/* Valoración mostrada */
+.valoracion-display {
+  min-width: 50px;
+  text-align: right;
+  font-weight: bold;
+}
+
+/* Elementos a ancho completo */
+.full-width {
+  width: 100%;
+}
+
+/* Acciones del modal */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
+}
