@@ -33,11 +33,9 @@ public class Participant {
     private Long id;
 
     @NotNull(message = "El nombre del participante no puede ser nulo")
-    @Pattern(regexp = "^[a-zA-Z ]+$", message = "El nombre solo debe contener letras")
     private String name;
 
     @NotNull(message = "El cntro educativo no puede ser nulo")
-    @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "El nombre del centro debe ser un alfanumérico")
     private String center;
 
     @DecimalMin(value = "0.0", message = "La puntuacion no puede ser negativa")
@@ -45,7 +43,7 @@ public class Participant {
 
 
     @ManyToOne
-    @JoinColumn(name = "specialty_id") 
+    @JoinColumn(name = "specialty_id", nullable=true) 
     private Specialty specialty;
 
 

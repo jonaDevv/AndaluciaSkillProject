@@ -19,10 +19,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.jrm.error.evaluacion.EvaluacionNotFoundException;
+import com.jrm.error.evaluacionitem.EvaluacionItemNotFoundException;
 import com.jrm.error.item.ItemNotFoundException;
 import com.jrm.error.participant.ParticipantNotFoundException;
 import com.jrm.error.prueba.PruebaNotFoundException;
 import com.jrm.error.specialty.SpecialtyNotFoundException;
+import com.jrm.error.user.NoExpertsAvailableException;
 import com.jrm.error.user.UserNotFoundException;
 import com.jrm.error.user.UsernameExistsException;
 
@@ -63,6 +65,13 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
+    @ExceptionHandler(NoExpertsAvailableException.class)
+    public ResponseEntity<ApiError> handleNoExpertsAvailable(NoExpertsAvailableException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
 	
 	@ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<ApiError> handleSpecialtyNotFound(ItemNotFoundException ex) {
@@ -79,12 +88,13 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
 
-    @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<ApiError> handleItemNotFound(ItemNotFoundException ex) {
+    @ExceptionHandler(  EvaluacionItemNotFoundException.class)
+    public ResponseEntity<ApiError> handleEvaluacionItemNotFound(EvaluacionItemNotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, LocalDateTime.now(), ex.getMessage());
             
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
+    
 
    
 	

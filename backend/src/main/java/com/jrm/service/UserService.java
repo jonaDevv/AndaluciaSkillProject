@@ -104,6 +104,13 @@ public class UserService implements BaseService<User, Long> {
         userRepository.delete(user); // Elimina al usuario si existe
     }
 
+    public List<User> getExpertsForSpecialty(Long specialtyId) {
+        return userRepository.findExpertsBySpecialtyOrderByEvaluationCount(
+            specialtyId, 
+            UserRole.EXPERT // Pasar el enum correctamente
+        );
+    }
+
     
 
    

@@ -62,7 +62,7 @@ public class User implements UserDetails {
     private String password;
 
    	@ManyToOne
-    @JoinColumn(name = "specialty_id") 
+    @JoinColumn(name = "specialty_id", nullable=true) 
     private Specialty specialty;
 
     @ElementCollection(fetch = FetchType.EAGER)

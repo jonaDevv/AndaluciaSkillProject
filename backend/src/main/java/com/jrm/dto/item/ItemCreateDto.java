@@ -3,6 +3,7 @@ package com.jrm.dto.item;
 
 import org.springframework.validation.annotation.Validated;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,18 +24,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class ItemCreateDto {
 
-
-     @NotNull(message = "La descripcion no puede ser nula")
+    @Schema(description = "Descripción del item", example = "Evaluación de matrices", required = true)
+    @NotNull(message = "La descripcion no puede ser nula")
     private String description;
 
-     @NotNull
+    @NotNull
     @Positive(message = "El valor debe ser positivo")
     private int weight;
 
     @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
     private float percentage;
 
-  @NotNull(message = "El test al que pertenece no puede ser nulo")
+    @Schema(description = "ID de la prueba relacionada", example = "1", required = true)
+    @NotNull(message = "El test al que pertenece no puede ser nulo")
     private Long prueba;
 
 

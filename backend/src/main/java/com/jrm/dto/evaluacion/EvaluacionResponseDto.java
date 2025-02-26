@@ -23,16 +23,18 @@ public class EvaluacionResponseDto {
 
     private Long id;
 
-    private String pFinalObtenida;
+    private float pFinalObtenida;
+
+    private float porcentajeFinalObtenido;
 
     
-    private String userName;
+    private long user;
 
    
-    private String participantName;
+    private long participant;
 
     
-    private String pruebaName;
+    private long prueba;
 
     
 }

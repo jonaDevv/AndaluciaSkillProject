@@ -1,6 +1,7 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { LoginService } from '../service/login.service';
+
 export const guardExpertGuard: CanActivateFn = (route, state) => {
     
     let respuesta:boolean=false;
@@ -8,7 +9,7 @@ export const guardExpertGuard: CanActivateFn = (route, state) => {
     let service= inject(LoginService);
     let ruta=inject(Router)
 
-    if(service.getPerfil()=="EXPERT")
+    if(service.getPerfil()=="expert")
         respuesta=true
       else
       ruta.navigate(['login'])

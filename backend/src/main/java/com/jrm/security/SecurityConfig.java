@@ -94,13 +94,22 @@ public class SecurityConfig {
                 // Endpoints públicos
                 .requestMatchers(HttpMethod.POST,"/auth/login", "/auth/register").permitAll()
                 
+                .requestMatchers(
+    "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/webjars/**"
+            ).permitAll()
                 
-                .requestMatchers(HttpMethod.GET, "/participant").hasAuthority("ROLE_EXPERT")
-                .requestMatchers(HttpMethod.PUT, "/participant/**").hasAuthority("ROLE_EXPERT")
-                .requestMatchers(HttpMethod.DELETE, "/participant/**").hasAuthority("ROLE_EXPERT")
+                .requestMatchers("/files/**").permitAll() // Asegurar acceso público
+                .requestMatchers(HttpMethod.POST, "/participant","/prueba","/evaluaciones","/evaluacionitem","/item").hasAuthority("ROLE_EXPERT")
+                .requestMatchers(HttpMethod.GET, "/specialty","/participant","/prueba","/evaluaciones","/evaluaciones/**","/evaluacionitem","/item").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/participant/**","/prueba/**","/evaluaciones/**","/evaluacion","/evaluacionitem/**","/item/**").hasAuthority("ROLE_EXPERT")
+                .requestMatchers(HttpMethod.DELETE, "/participant/**","/prueba/**","/evaluaciones/**","/evaluacionitem/**","item/**").hasAuthority("ROLE_EXPERT")
                 
                 // Operaciones de escritura (solo ADMIN)
-                .requestMatchers(HttpMethod.GET, "item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/participant","item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.POST, "item","/prueba","/participant","/users", "/specialty").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "item/**","/prueba/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "item/**","/prueba/**","/participant/**","/users/**", "/specialty/**").hasAuthority("ROLE_ADMIN")
@@ -116,9 +125,9 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:8080"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setMaxAge(3600L);
         

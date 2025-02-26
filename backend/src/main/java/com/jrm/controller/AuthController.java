@@ -14,6 +14,12 @@ import com.jrm.service.ApiErrorService;
 import com.jrm.service.SpecialtyService;
 import com.jrm.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -24,11 +30,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
+@Tag(name = "Autenticación", description = "Operaciones de login y registro")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -43,6 +52,21 @@ public class AuthController {
     private final SpecialtyService specialtyService;
 
 
+    
+    @Operation(
+        summary = "Logearse en AndalucíaSkills",
+        description = "Autenticación de usuarios",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Autenticación exitosa",
+                content = @Content(schema = @Schema(implementation = LoginDto.class))),
+            @ApiResponse(
+                responseCode = "401",
+                description = "Credenciales inválidas",
+                content = @Content(schema = @Schema(implementation = ApiError.class)))
+        }
+    )
     @PostMapping("/login")
     public LoginDto login(@RequestBody LoginRequest loginRequest) {
         System.out.println("Recibiendo solicitud de login:");
@@ -72,8 +96,24 @@ public class AuthController {
         }
     }
 
+
+
+    @Operation(
+        summary = "Registro en AndalucíaSkills",
+        description = "Registro de usuarios",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Registro exitoso",
+                content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
+            @ApiResponse(
+                responseCode = "401",
+                description = "Credenciales inválidas",
+                content = @Content(schema = @Schema(implementation = ApiError.class)))
+        }
+    )
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserCreateDTO userDto) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserCreateDTO userDto) {
          if (userService.findByDni(userDto.getDni()).isPresent()) {
             ApiError apiError = apiErrorService.getErrorMessage("El Dni " + userDto.getDni() + " ya existe");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);

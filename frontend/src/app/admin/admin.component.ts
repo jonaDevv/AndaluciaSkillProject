@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 })
 export class AdminComponent {
 
-  listAdmin : any[]=[]
+  listExpert : any[]=[]
 
   constructor(private admin : AdminServiceService){
     
@@ -24,25 +24,26 @@ export class AdminComponent {
       
       
 
-        this.listAdmin= res;
+        this.listExpert= res;
       
 
       console.log(res);
-      //como accedo a las propiedes
-
-      
-      
       
     });
-
-
-    
-    
-
-    
-   
    
  }
+
+
+  delete(id : String){
+
+    this.admin.deleteUser(id);
+    this.listExpert.splice(this.listExpert.findIndex(expert => expert.id == id), 1);
+  }
+
+  
+
+
+
 
 
 

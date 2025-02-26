@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jrm.model.Specialty;
@@ -42,6 +43,9 @@ public class PruebaCreateDto {
 
    @JsonProperty("specialtyId") 
     private Long specialtyId;
+
+    // Nueva propiedad para el PDF
+    private MultipartFile pdfFile;
 
     @Builder.Default
     private List<Item> items = new ArrayList<>();

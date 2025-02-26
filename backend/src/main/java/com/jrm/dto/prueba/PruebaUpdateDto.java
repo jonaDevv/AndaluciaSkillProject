@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jrm.model.Specialty;
 
@@ -34,6 +35,9 @@ public class PruebaUpdateDto {
   
    
     private Long specialtyId;
+
+    // Nueva propiedad para el PDF
+    private MultipartFile pdfFile;
 
      private List<Item> items = new ArrayList<>();
 

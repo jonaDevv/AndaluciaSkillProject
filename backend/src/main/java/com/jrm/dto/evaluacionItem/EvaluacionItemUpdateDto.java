@@ -4,6 +4,7 @@ import org.springframework.validation.annotation.Validated;
 
 import com.jrm.model.Evaluacion;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.DecimalMin;
@@ -19,9 +20,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class EvaluacionItemUpdateDto {
 
-    @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
-    private String valoracion;
+    private Long id;
 
+    private String description;
+
+
+    @Schema(description = "Valoración técnica", minimum = "0", maximum = "100", example = "85")
+    @DecimalMin(value = "0.0", message = "La valoracion no puede ser negativa")
+    private float valoracion;
+
+
+    @Schema(description = "Justificación de la valoración", example = "Dominio avanzado del tema")
     @Pattern(regexp = "^[a-zA-Z0-9]+([.,][0-9]+)?$", message = "La justificacion debe ser un alfanumérico")
     private String justificacion;
 

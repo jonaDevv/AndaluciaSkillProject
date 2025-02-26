@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ParticipantService } from '../service/participant.service';
 
 @Component({
   selector: 'app-lista-competidores',
@@ -9,9 +10,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './lista-competidores.component.css'
 })
 export class ListaCompetidoresComponent {
-
+  listaParticipantes:any[];
   listacompetidores:any[];
-  constructor(){
+  constructor(
+    private participant: ParticipantService,
+  ){
     this.listacompetidores = [
       {
         id:1,
@@ -39,6 +42,18 @@ export class ListaCompetidoresComponent {
         especialidad: "Ingeniería"
       }
     ];
+
+    this.listaParticipantes = [];
   } 
+
+  ngOnInit(){
+
+    
+    this.participant.getAllP().subscribe((res: any[]) => {
+      this.listaParticipantes = res;
+    });
+
+    
+  }
 
 }
