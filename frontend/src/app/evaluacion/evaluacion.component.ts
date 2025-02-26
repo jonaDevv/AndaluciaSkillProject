@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
 import { EvaluacionService } from '../service/evaluacion.service';
 import { CommonModule } from '@angular/common';
 import { MatSliderModule } from '@angular/material/slider';
@@ -71,32 +71,32 @@ export class EvaluacionComponent implements OnInit {
   }
 
   // Para modo edición (pendientes)
-seleccionarEvaluacion(evaluacionId: number) {
-  this.modoLectura = false;
-  this.evaluacionService.getDetails(evaluacionId).subscribe({
-    next: (data) => {
-      console.log('DETALLES DE EVALUACIÓN:', data);
-      this.evaluacionSeleccionada = data;
-      this.inicializarFormulario(data.items);
-      this.cd.detectChanges();
-    },
-    error: (err) => console.error(err)
-  });
-}
+  seleccionarEvaluacion(evaluacionId: number) {
+    this.modoLectura = false;
+    this.evaluacionService.getDetails(evaluacionId).subscribe({
+      next: (data) => {
+        console.log('DETALLES DE EVALUACIÓN:', data);
+        this.evaluacionSeleccionada = data;
+        this.inicializarFormulario(data.items);
+        this.cd.detectChanges();
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
-// Para modo sólo lectura (finalizadas)
-verEvaluacion(evaluacionId: number) {
-  this.modoLectura = true;
-  this.evaluacionService.getDetails(evaluacionId).subscribe({
-    next: (data) => {
-      console.log('DETALLES DE EVALUACIÓN (modo lectura):', data);
-      this.evaluacionSeleccionada = data;
-      this.inicializarFormulario(data.items);
-      this.cd.detectChanges();
-    },
-    error: (err) => console.error(err)
-  });
-}
+  // Para modo sólo lectura (finalizadas)
+  verEvaluacion(evaluacionId: number) {
+    this.modoLectura = true;
+    this.evaluacionService.getDetails(evaluacionId).subscribe({
+      next: (data) => {
+        console.log('DETALLES DE EVALUACIÓN (modo lectura):', data);
+        this.evaluacionSeleccionada = data;
+        this.inicializarFormulario(data.items);
+        this.cd.detectChanges();
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
   inicializarFormulario(items: any[]) {
     this.itemsFormArray.clear();
@@ -132,11 +132,27 @@ verEvaluacion(evaluacionId: number) {
     }
   }
 
-  finalizarEvaluacion() {
+  // finalizarEvaluacion() {
     
-    this.evaluacionService.finalizar(this.evaluacionSeleccionada.id).subscribe({
-      next: () => this.actualizarLista()
-    });
+  //   this.evaluacionService.finalizar(this.evaluacionSeleccionada.id).subscribe({
+  //     next: () => this.actualizarLista()
+  //   });
+  // }
+
+  finalizarEvaluacion() {
+    if (this.evaluacionForm.valid) {
+      const updateObservables = this.itemsFormArray.value.map((item: any) =>
+        this.evaluacionService.updateItem(item.id, item)
+      );
+  
+      forkJoin(updateObservables).pipe(
+        switchMap(() => this.evaluacionService.calcular(this.evaluacionSeleccionada.id)),
+        switchMap(() => this.evaluacionService.finalizar(this.evaluacionSeleccionada.id))
+      ).subscribe({
+        next: () => this.actualizarLista(),
+        error: (err) => console.error('Error en el proceso:', err)
+      });
+    }
   }
 
   actualizarLista() {

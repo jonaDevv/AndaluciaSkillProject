@@ -4,18 +4,19 @@
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body">
           <h3 class="card-title text-center text-dark mb-4">Login</h3>
-          <form>
+          <form [formGroup]="loginForm" (ngSubmit)="logear()">
             <div class="mb-3">
               <label for="usuario" class="form-label text-muted">Usuario</label>
               <input 
                 type="text" 
                 id="usuario" 
                 class="form-control form-control-lg rounded-3" 
-                [(ngModel)]="usuario" 
-                name="usuario" 
-                required
+                formControlName="usuario" 
                 placeholder="Ingrese su usuario"
               />
+              <div *ngIf="usuario?.invalid && usuario?.touched" class="text-danger small">
+                El usuario es obligatorio y debe tener al menos 3 caracteres.
+              </div>
             </div>
 
             <div class="mb-4">
@@ -24,11 +25,12 @@
                 type="password" 
                 id="clave" 
                 class="form-control form-control-lg rounded-3" 
-                [(ngModel)]="clave" 
-                name="clave" 
-                required
+                formControlName="clave" 
                 placeholder="Ingrese su clave"
               />
+              <div *ngIf="clave?.invalid && clave?.touched" class="text-danger small">
+                La clave es obligatoria y debe tener al menos 6 caracteres.
+              </div>
             </div>
 
             <!-- Mostrar mensaje de error si existe -->
@@ -38,9 +40,9 @@
 
             <div class="d-grid gap-2">
               <button 
-                type="button" 
-                class="btn btn-dark btn-lg rounded-3" 
-                (click)="logear()">
+                type="submit" 
+                class="btn btn-dark btn-lg rounded-3"
+              >
                 Login
               </button>
             </div>

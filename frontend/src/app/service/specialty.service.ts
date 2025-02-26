@@ -24,6 +24,9 @@ export class SpecialtyService {
   // Manejo de errores
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('Ocurrió un error:', error);
+    // Aquí podrías, por ejemplo, notificar algo a nivel global,
+    // pero si deseas que la cadena no se "rompa", podrías hacer algo como:
+    // return of(null);  // Retorna un valor nulo (aunque esto depende de la lógica de la aplicación)
     return throwError(() => error);
   }
 
