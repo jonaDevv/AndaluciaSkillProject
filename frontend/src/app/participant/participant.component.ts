@@ -28,6 +28,7 @@ export class ParticipantComponent implements OnInit {
   selectedParticipantId: any;
   constructor(private p: ParticipantService, private modalService: NgbModal, private spe: SpecialtyService, private login: LoginService) {
     this.userEspecialidad = this.login.getEspecialidad();
+    this.listParticipant = [];
   }
 
   ngOnInit() {

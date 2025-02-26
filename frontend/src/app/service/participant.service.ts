@@ -46,17 +46,7 @@ export class ParticipantService {
         'Authorization': `Bearer ${this.token}`
       });
 
-      return this.http.get<any[]>('http://localhost:8080/participant/ganadores', { headers }).pipe(
-        map((participantes: any[]) => {
-          console.log(participantes);
-          return participantes;
-        }),
-        catchError(error => {
-          console.error('Error:', error);
-          return of([]);
-        })
-       
-      );
+      return this.http.get<any[]>('http://localhost:8080/participant/ganadores', { headers })
     }
 
   getAllP(): Observable<any[]> {
